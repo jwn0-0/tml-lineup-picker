@@ -229,7 +229,7 @@ body::before {
   gap: 0;
   overflow: visible;
   padding-bottom: 8px;
-  min-width: max-content;
+  width: 100%;
 }
 
 .timeline-scroll-wrapper {
@@ -1057,7 +1057,7 @@ body::before {
 
   .timeline-container { padding: 0 0 80px; }
 
-  .all-stages-view { gap: 0; }
+  .all-stages-view { gap: 0; width: max-content; min-width: 100%; }
   .stage-column { min-width: 110px; flex-shrink: 0; }
   .stage-column-header { font-size: 8px; padding: 5px 2px; letter-spacing: 0.5px; }
 
@@ -2136,20 +2136,17 @@ async function saveAsImage() {
   try {
     // Scroll to top-left to capture full content
     window.scrollTo(0, 0);
-    const wrapper = document.querySelector('.timeline-scroll-wrapper');
-    if (wrapper) wrapper.scrollLeft = 0;
+    const scrollWrap = document.querySelector('.timeline-scroll-wrapper');
+    if (scrollWrap) scrollWrap.scrollLeft = 0;
 
     await new Promise(r => setTimeout(r, 200));
-
-    // Get actual full content width (including horizontal scroll content)
-    const wrapper = document.querySelector('.timeline-scroll-wrapper');
-    const contentW = wrapper ? Math.max(wrapper.scrollWidth, document.body.scrollWidth) : document.body.scrollWidth;
+    const contentW = scrollWrap ? Math.max(scrollWrap.scrollWidth, document.body.scrollWidth) : document.body.scrollWidth;
     const contentH = document.body.scrollHeight;
 
     // Temporarily expand wrapper so all columns are visible
-    if (wrapper) {
-      wrapper.style.overflow = 'visible';
-      wrapper.style.width = contentW + 'px';
+    if (scrollWrap) {
+      scrollWrap.style.overflow = 'visible';
+      scrollWrap.style.width = contentW + 'px';
     }
     document.body.style.width = contentW + 'px';
     document.body.style.overflow = 'visible';
@@ -2201,7 +2198,7 @@ async function saveAsImage() {
     });
 
     // Restore
-    if (wrapper) { wrapper.style.overflow = ''; wrapper.style.width = ''; }
+    if (scrollWrap) { scrollWrap.style.overflow = ''; scrollWrap.style.width = ''; }
     document.body.style.width = '';
     document.body.style.overflow = '';
 
