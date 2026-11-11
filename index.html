@@ -2141,26 +2141,33 @@ async function saveAsImage() {
 
     await new Promise(r => setTimeout(r, 100));
 
-    // First expand overflow to measure true content width
-    if (scrollWrap) scrollWrap.style.overflow = 'visible';
+    // Calculate required width: 7 stages * 140px + sidebar 40px + padding
+    // Use fixed minimum that fits all 7 stages comfortably
+    const numStages = TIMETABLE.stages.length;
+    const minStageW = 140;
+    const sidebarW = 40;
+    const requiredW = numStages * minStageW + sidebarW + 20;
+
+    // Expand everything to full width
+    if (scrollWrap) {
+      scrollWrap.style.overflow = 'visible';
+      scrollWrap.style.width = requiredW + 'px';
+    }
+    const allStagesView = document.querySelector('.all-stages-view');
+    if (allStagesView) allStagesView.style.width = (numStages * minStageW) + 'px';
+    // Force each column to exact width
+    document.querySelectorAll('.stage-column').forEach(col => {
+      col.style.width = minStageW + 'px';
+      col.style.minWidth = minStageW + 'px';
+      col.style.flex = 'none';
+    });
+    document.body.style.width = requiredW + 'px';
     document.body.style.overflow = 'visible';
 
-    await new Promise(r => setTimeout(r, 100));
+    await new Promise(r => setTimeout(r, 200));
 
-    // Now measure full content including all 7 stage columns
-    const allStagesView = document.querySelector('.all-stages-view');
-    const contentW = Math.max(
-      document.body.scrollWidth,
-      scrollWrap ? scrollWrap.scrollWidth : 0,
-      allStagesView ? allStagesView.scrollWidth + 40 : 0
-    );
+    const contentW = requiredW;
     const contentH = document.body.scrollHeight;
-
-    // Set explicit width so html2canvas captures everything
-    if (scrollWrap) scrollWrap.style.width = contentW + 'px';
-    document.body.style.width = contentW + 'px';
-
-    await new Promise(r => setTimeout(r, 100));
 
     const canvas = await html2canvas(document.body, {
       backgroundColor: '#06060f',
@@ -2208,6 +2215,12 @@ async function saveAsImage() {
 
     // Restore
     if (scrollWrap) { scrollWrap.style.overflow = ''; scrollWrap.style.width = ''; }
+    if (allStagesView) allStagesView.style.width = '';
+    document.querySelectorAll('.stage-column').forEach(col => {
+      col.style.width = '';
+      col.style.minWidth = '';
+      col.style.flex = '';
+    });
     document.body.style.width = '';
     document.body.style.overflow = '';
 
