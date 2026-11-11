@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+<head><meta charset="UTF-8"></head>
+<body style="margin:0;padding:0;">
+<canvas id="c" width="1200" height="630"></canvas>
+<script>
+const canvas = document.getElementById('c');
+const ctx = canvas.getContext('2d');
+
+// Background
+ctx.fillStyle = '#06060f';
+ctx.fillRect(0, 0, 1200, 630);
+
+// Subtle gradient overlay
+const grd = ctx.createRadialGradient(600, 300, 0, 600, 300, 600);
+grd.addColorStop(0, 'rgba(212,168,67,0.08)');
+grd.addColorStop(1, 'transparent');
+ctx.fillStyle = grd;
+ctx.fillRect(0, 0, 1200, 630);
+
+// Title
+ctx.textAlign = 'center';
+ctx.fillStyle = '#d4a843';
+ctx.font = 'bold 64px Georgia, serif';
+ctx.fillText('TOMORROWLAND', 600, 200);
+ctx.font = 'bold 48px Georgia, serif';
+ctx.fillText('THAILAND 2026', 600, 265);
+
+// Subtitle
+ctx.fillStyle = 'rgba(255,255,255,0.6)';
+ctx.font = '24px sans-serif';
+ctx.fillText('December 11 – 13  ·  7 Stages  ·  150+ Artists', 600, 330);
+
+// CTA
+ctx.fillStyle = '#d4a843';
+ctx.font = 'bold 28px sans-serif';
+ctx.fillText('Pick your DJs. Share with your crew.', 600, 420);
+
+// Stage color dots
+const colors = ['#FFD700','#FF6B35','#00D4AA','#9B59B6','#3498DB','#E91E63','#8BC34A'];
+const startX = 600 - (colors.length * 40) / 2;
+colors.forEach((c, i) => {
+  ctx.fillStyle = c;
+  ctx.beginPath();
+  ctx.arc(startX + i * 40 + 20, 490, 10, 0, Math.PI * 2);
+  ctx.fill();
+});
+
+// Download
+const link = document.createElement('a');
+link.download = 'og-image.png';
+link.href = canvas.toDataURL('image/png');
+link.click();
+document.body.innerHTML = '<p style="color:white;font-family:sans-serif;padding:20px;">og-image.png downloaded! Move it to the project folder.</p>';
+</script>
+</body>
+</html>
