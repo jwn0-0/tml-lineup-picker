@@ -235,6 +235,7 @@ body::before {
 .timeline-scroll-wrapper {
   scrollbar-width: none;
   -ms-overflow-style: none;
+  touch-action: pan-x pan-y;
 }
 .timeline-scroll-wrapper::-webkit-scrollbar { display: none; }
 
@@ -2140,18 +2141,29 @@ async function saveAsImage() {
 
     await new Promise(r => setTimeout(r, 200));
 
-    // Capture full scrollable area
-    const fullW = document.body.scrollWidth;
-    const fullH = document.body.scrollHeight;
+    // Get actual full content width (including horizontal scroll content)
+    const wrapper = document.querySelector('.timeline-scroll-wrapper');
+    const contentW = wrapper ? Math.max(wrapper.scrollWidth, document.body.scrollWidth) : document.body.scrollWidth;
+    const contentH = document.body.scrollHeight;
+
+    // Temporarily expand wrapper so all columns are visible
+    if (wrapper) {
+      wrapper.style.overflow = 'visible';
+      wrapper.style.width = contentW + 'px';
+    }
+    document.body.style.width = contentW + 'px';
+    document.body.style.overflow = 'visible';
+
+    await new Promise(r => setTimeout(r, 100));
 
     const canvas = await html2canvas(document.body, {
       backgroundColor: '#06060f',
       scale: 2,
       logging: false,
-      width: fullW,
-      height: fullH,
-      windowWidth: fullW,
-      windowHeight: fullH,
+      width: contentW,
+      height: contentH,
+      windowWidth: contentW,
+      windowHeight: contentH,
       scrollX: 0,
       scrollY: 0,
       onclone: (clonedDoc) => {
@@ -2171,9 +2183,8 @@ async function saveAsImage() {
         if (ctrl) ctrl.style.position = 'relative';
         const tc = clonedDoc.querySelector('.timeline-container');
         if (tc) tc.style.paddingBottom = '4px';
-        // Make wrapper show full content (no scroll clip)
         const tw = clonedDoc.querySelector('.timeline-scroll-wrapper');
-        if (tw) { tw.style.overflow = 'visible'; tw.style.width = 'auto'; }
+        if (tw) { tw.style.overflow = 'visible'; tw.style.width = contentW + 'px'; }
         clonedDoc.querySelectorAll('.dj-card').forEach(card => {
           card.style.backdropFilter = 'none';
           card.style.webkitBackdropFilter = 'none';
@@ -2185,9 +2196,14 @@ async function saveAsImage() {
         });
         clonedDoc.body.style.background = '#06060f';
         clonedDoc.body.style.overflow = 'visible';
-        clonedDoc.body.style.width = fullW + 'px';
+        clonedDoc.body.style.width = contentW + 'px';
       }
     });
+
+    // Restore
+    if (wrapper) { wrapper.style.overflow = ''; wrapper.style.width = ''; }
+    document.body.style.width = '';
+    document.body.style.overflow = '';
 
     // Show image in preview modal (long-press to save on mobile)
     const dataUrl = canvas.toDataURL('image/png');
