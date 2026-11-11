@@ -219,25 +219,25 @@ body::before {
 .timeline-container {
   position: relative;
   z-index: 1;
-  padding: 0 8px 60px;
-  max-width: 1400px;
-  margin: 0 auto;
+  padding: 0 0 20px;
+  width: 100%;
 }
 
 /* All-stages grid */
 .all-stages-view {
   display: flex;
   gap: 0;
-  overflow-x: auto;
-  scrollbar-width: thin;
+  overflow: hidden;
   padding-bottom: 8px;
+  flex: 1;
+  min-width: 0;
 }
 
 .stage-column {
-  flex-shrink: 0;
-  min-width: 160px;
   flex: 1;
+  min-width: 0;
   position: relative;
+  overflow: hidden;
 }
 
 .stage-column-header {
@@ -871,7 +871,7 @@ body::before {
 
   /* ALL view: 2-column swipeable grid instead of 7 tiny columns */
   .all-stages-view { gap: 0; }
-  .stage-column { min-width: 48vw; }
+  .stage-column { min-width: 44vw; }
   .stage-column-header { font-size: 9px; padding: 6px 2px; letter-spacing: 0.5px; }
 
   .dj-card { left: 2px; right: 2px; padding: 6px 6px; border-radius: 8px; min-height: 38px; }
@@ -908,14 +908,14 @@ body::before {
   .festival-logo { font-size: 13px; }
   .dj-avatar { width: 34px; height: 34px; font-size: 10px; }
   .dj-name { font-size: 10px; }
-  .stage-column { min-width: 44vw; }
+  .stage-column { min-width: 42vw; }
   .stage-tab { padding: 3px 8px; font-size: 9px; }
   .day-tab { padding: 5px 6px; font-size: 10px; }
 }
 
 /* Tablet */
 @media (min-width: 768px) {
-  .stage-column { min-width: 180px; }
+  .stage-column { min-width: 140px; }
   .dj-card { left: 6px; right: 6px; padding: 8px 10px; }
   .dj-name { font-size: 13px; }
   .dj-avatar { width: 52px; height: 52px; }
@@ -929,7 +929,7 @@ body::before {
 
 /* Desktop */
 @media (min-width: 1024px) {
-  .stage-column { min-width: 170px; }
+  .stage-column { min-width: 150px; }
   .dj-avatar { width: 56px; height: 56px; }
   :root { --hour-height: 90px; }
 }
@@ -1643,7 +1643,7 @@ function renderAllStages() {
 
   // Add a shared time sidebar
   const wrapper = document.createElement('div');
-  wrapper.style.cssText = 'display: flex; position: relative;';
+  wrapper.style.cssText = 'display: flex; position: relative; width: 100%;';
 
   const sidebar = document.createElement('div');
   sidebar.style.cssText = 'flex-shrink: 0; width: 42px; position: relative;';
@@ -1845,31 +1845,42 @@ async function saveAsImage() {
   const day = TIMETABLE.days[currentDay];
 
   try {
-    // Images are already data URLs (loaded via XHR blob), so canvas won't be tainted
     const fab = document.querySelector('.floating-actions');
     const swipeHint = document.getElementById('swipeHint');
-    fab.style.display = 'none';
-    if (swipeHint) swipeHint.style.display = 'none';
+    const header = document.querySelector('.festival-header');
+    const search = document.querySelector('.search-container');
+    const controls = document.querySelector('.sticky-controls');
+    const timeline = document.getElementById('timelineContainer');
 
-    // Capture with html2canvas
     const canvas = await html2canvas(document.body, {
       backgroundColor: '#06060f',
       scale: 2,
       logging: false,
-      width: document.body.scrollWidth,
+      width: document.documentElement.clientWidth,
       height: document.body.scrollHeight,
-      windowWidth: document.body.scrollWidth,
+      windowWidth: document.documentElement.clientWidth,
       windowHeight: document.body.scrollHeight,
+      scrollX: 0,
+      scrollY: 0,
       onclone: (clonedDoc) => {
-        // Hide header, search bar
-        const header = clonedDoc.querySelector('.festival-header');
-        if (header) header.style.display = 'none';
-        const search = clonedDoc.querySelector('.search-container');
-        if (search) search.style.display = 'none';
-        // Make sticky controls non-sticky so they render in flow
-        const controls = clonedDoc.querySelector('.sticky-controls');
-        if (controls) controls.style.position = 'relative';
-
+        // Hide header, search, FABs, swipe hint
+        const h = clonedDoc.querySelector('.festival-header');
+        if (h) h.style.display = 'none';
+        const s = clonedDoc.querySelector('.search-container');
+        if (s) s.style.display = 'none';
+        const f = clonedDoc.querySelector('.floating-actions');
+        if (f) f.style.display = 'none';
+        const sw = clonedDoc.querySelector('.swipe-hint');
+        if (sw) sw.style.display = 'none';
+        const fb = clonedDoc.querySelector('.friend-banner');
+        if (fb) fb.style.display = 'none';
+        // Unstick controls
+        const ctrl = clonedDoc.querySelector('.sticky-controls');
+        if (ctrl) ctrl.style.position = 'relative';
+        // Tight bottom
+        const tc = clonedDoc.querySelector('.timeline-container');
+        if (tc) tc.style.paddingBottom = '4px';
+        // Fix backdrop-filter
         clonedDoc.querySelectorAll('.dj-card').forEach(card => {
           card.style.backdropFilter = 'none';
           card.style.webkitBackdropFilter = 'none';
@@ -1879,21 +1890,10 @@ async function saveAsImage() {
             ? 'rgba(255,45,85,0.2)'
             : 'rgba(30,30,60,0.85)';
         });
-        const cf = clonedDoc.querySelector('.floating-actions');
-        if (cf) cf.style.display = 'none';
-        const sh = clonedDoc.querySelector('.swipe-hint');
-        if (sh) sh.style.display = 'none';
-        const fb = clonedDoc.querySelector('.friend-banner');
-        if (fb) fb.style.display = 'none';
         clonedDoc.body.style.background = '#06060f';
-        // Remove bottom padding for tight capture
-        const tc = clonedDoc.querySelector('.timeline-container');
-        if (tc) tc.style.paddingBottom = '8px';
+        clonedDoc.body.style.overflow = 'visible';
       }
     });
-
-    fab.style.display = '';
-    if (swipeHint) swipeHint.style.display = '';
 
     // Download
     const link = document.createElement('a');
