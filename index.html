@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 <title>Tomorrowland Thailand 2026 - Lineup Picker</title>
 
 <!-- SEO & Social Share -->
@@ -227,17 +227,22 @@ body::before {
 .all-stages-view {
   display: flex;
   gap: 0;
-  overflow: hidden;
+  overflow: visible;
   padding-bottom: 8px;
-  flex: 1;
-  min-width: 0;
+  min-width: max-content;
 }
+
+.timeline-scroll-wrapper {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.timeline-scroll-wrapper::-webkit-scrollbar { display: none; }
 
 .stage-column {
   flex: 1;
-  min-width: 0;
+  min-width: 120px;
   position: relative;
-  overflow: hidden;
+  overflow: visible;
 }
 
 .stage-column-header {
@@ -822,6 +827,146 @@ body::before {
 
 .friend-banner.show { display: flex; }
 
+/* Mobile ALL list view */
+.mobile-all-view {
+  padding: 0 10px;
+}
+
+.mobile-stage-section {
+  margin-bottom: 12px;
+}
+
+.mobile-stage-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  border-radius: 8px;
+  background: rgba(255,255,255,0.04);
+  border-left: 3px solid var(--stage-color);
+  margin-bottom: 6px;
+  cursor: pointer;
+}
+
+.mobile-stage-header .stage-name {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--stage-color);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  flex: 1;
+}
+
+.mobile-stage-header .stage-count {
+  font-size: 10px;
+  color: var(--text-muted);
+}
+
+.mobile-stage-header .chevron {
+  font-size: 12px;
+  color: var(--text-muted);
+  transition: transform 0.2s;
+}
+
+.mobile-stage-section.collapsed .chevron {
+  transform: rotate(-90deg);
+}
+
+.mobile-stage-section.collapsed .mobile-set-list {
+  display: none;
+}
+
+.mobile-set-list {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.mobile-set-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 10px;
+  border-radius: 8px;
+  background: rgba(255,255,255,0.03);
+  cursor: pointer;
+  transition: background 0.2s;
+  border: 1px solid transparent;
+}
+
+.mobile-set-item.selected {
+  background: rgba(212,168,67,0.12);
+  border-color: var(--gold);
+}
+
+.mobile-set-item.selected .mobile-set-check {
+  display: flex;
+}
+
+.mobile-set-item.conflict {
+  background: rgba(255,45,85,0.1);
+  border-color: rgba(255,45,85,0.4);
+}
+
+.mobile-set-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  overflow: hidden;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: 700;
+  color: #000;
+  border: 1.5px solid rgba(255,255,255,0.15);
+}
+
+.mobile-set-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.mobile-set-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.mobile-set-name {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.mobile-set-item.selected .mobile-set-name {
+  color: var(--gold-light);
+}
+
+.mobile-set-time {
+  font-size: 10px;
+  color: var(--text-secondary);
+}
+
+.mobile-set-check {
+  display: none;
+  width: 20px;
+  height: 20px;
+  background: var(--gold);
+  border-radius: 50%;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.mobile-set-check::after {
+  content: '✓';
+  font-size: 12px;
+  color: #000;
+  font-weight: 800;
+}
+
 /* Mobile swipe hint */
 .swipe-hint {
   display: none;
@@ -849,7 +994,7 @@ body::before {
 
 /* Mobile first (default is mobile) */
 @media (max-width: 767px) {
-  :root { --hour-height: 80px; }
+  :root { --hour-height: 60px; }
 
   .festival-header { padding: 12px 12px 6px; }
   .festival-logo { font-size: 15px; letter-spacing: 2px; }
@@ -867,20 +1012,22 @@ body::before {
   .stage-tabs { padding: 4px 10px 6px; gap: 4px; }
   .stage-tab { padding: 4px 10px; font-size: 10px; border-radius: 14px; }
 
-  .timeline-container { padding: 0 4px 100px; }
+  .timeline-container { padding: 0 0 80px; }
 
-  /* ALL view: 2-column swipeable grid instead of 7 tiny columns */
   .all-stages-view { gap: 0; }
-  .stage-column { min-width: 44vw; }
-  .stage-column-header { font-size: 9px; padding: 6px 2px; letter-spacing: 0.5px; }
+  .stage-column { min-width: 110px; flex-shrink: 0; }
+  .stage-column-header { font-size: 8px; padding: 5px 2px; letter-spacing: 0.5px; }
 
-  .dj-card { left: 2px; right: 2px; padding: 6px 6px; border-radius: 8px; min-height: 38px; }
-  .dj-card-inner { gap: 6px; }
-  .dj-avatar { width: 40px; height: 40px; font-size: 12px; }
-  .dj-avatar.small { width: 28px; height: 28px; font-size: 9px; }
-  .dj-name { font-size: 11px; }
-  .dj-time { font-size: 9px; }
-  .dj-stage-tag { font-size: 7px; }
+  .dj-card { left: 1px; right: 1px; padding: 4px 4px; border-radius: 6px; min-height: 32px; }
+  .dj-card-inner { gap: 4px; }
+  .dj-avatar { width: 32px; height: 32px; font-size: 9px; border-width: 1px; }
+  .dj-avatar.small { width: 26px; height: 26px; font-size: 8px; }
+  .dj-card.compact .dj-avatar { display: flex !important; }
+  .dj-name { font-size: 9px; line-height: 1.2; }
+  .dj-time { font-size: 7px; }
+  .dj-stage-tag { font-size: 6px; }
+  .dj-card.selected::after { width: 12px; height: 12px; top: 2px; right: 2px; background-size: 8px; }
+  .conflict-badge { width: 12px; height: 12px; font-size: 8px; top: 2px; right: 14px; }
 
   .dj-card.selected::after { width: 14px; height: 14px; top: 4px; right: 4px; background-size: 10px; }
   .conflict-badge { width: 16px; height: 16px; font-size: 10px; top: 3px; right: 20px; }
@@ -904,11 +1051,9 @@ body::before {
 
 /* Very small phones */
 @media (max-width: 380px) {
-  :root { --hour-height: 70px; }
+  :root { --hour-height: 55px; }
   .festival-logo { font-size: 13px; }
-  .dj-avatar { width: 34px; height: 34px; font-size: 10px; }
-  .dj-name { font-size: 10px; }
-  .stage-column { min-width: 42vw; }
+  .stage-column { min-width: 95px; flex-shrink: 0; }
   .stage-tab { padding: 3px 8px; font-size: 9px; }
   .day-tab { padding: 5px 6px; font-size: 10px; }
 }
@@ -1643,10 +1788,11 @@ function renderAllStages() {
 
   // Add a shared time sidebar
   const wrapper = document.createElement('div');
-  wrapper.style.cssText = 'display: flex; position: relative; width: 100%;';
+  wrapper.style.cssText = 'display: flex; position: relative; width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch;';
+  wrapper.className = 'timeline-scroll-wrapper';
 
   const sidebar = document.createElement('div');
-  sidebar.style.cssText = 'flex-shrink: 0; width: 42px; position: relative;';
+  sidebar.style.cssText = 'flex-shrink: 0; width: 36px; position: sticky; left: 0; z-index: 10; background: var(--bg-primary, #06060f);';
   const totalHeight = minutesToPxHeight(currentTimelineHours() * 60);
   sidebar.style.minHeight = totalHeight + 'px';
   sidebar.style.marginTop = '30px'; // align with column body below header
@@ -1712,6 +1858,70 @@ function renderSingleStage() {
   body.appendChild(cardsArea);
   body.style.minHeight = totalHeight + 'px';
   view.appendChild(body);
+  container.appendChild(view);
+}
+
+function renderMobileAllStages() {
+  const container = document.getElementById('timelineContainer');
+  container.innerHTML = '';
+
+  const day = TIMETABLE.days[currentDay];
+  const view = document.createElement('div');
+  view.className = 'mobile-all-view';
+  const conflicts = findConflicts(currentDay);
+
+  TIMETABLE.stages.forEach(stage => {
+    const color = STAGE_COLORS[stage];
+    const sets = day.sets.filter(s => s.stage === stage);
+    // Sort: latest first (headliners on top)
+    sets.sort((a, b) => timeToMinutesRaw(b.start) - timeToMinutesRaw(a.start));
+
+    const section = document.createElement('div');
+    section.className = 'mobile-stage-section';
+
+    section.innerHTML = `
+      <div class="mobile-stage-header" style="--stage-color: ${color}" onclick="this.parentElement.classList.toggle('collapsed')">
+        <span class="stage-name">${stage}</span>
+        <span class="stage-count">${sets.length} sets</span>
+        <span class="chevron">▼</span>
+      </div>
+    `;
+
+    const list = document.createElement('div');
+    list.className = 'mobile-set-list';
+
+    sets.forEach(set => {
+      const key = getSetKey(currentDay, set.artist, set.stage);
+      const isSelected = selections.has(key);
+      const isFriend = friendSelections.has(key);
+      const isConflict = conflicts.has(key) && isSelected;
+
+      const item = document.createElement('div');
+      item.className = `mobile-set-item ${isSelected ? 'selected' : ''} ${isConflict ? 'conflict' : ''} ${isFriend ? 'friend-selected' : ''}`;
+      item.onclick = () => { toggleSelection(key); };
+
+      item.innerHTML = `
+        <div class="mobile-set-avatar" style="background: linear-gradient(135deg, ${color}, ${color}88);" data-artist="${set.artist}">
+          ${getInitials(set.artist)}
+        </div>
+        <div class="mobile-set-info">
+          <div class="mobile-set-name">${set.artist}</div>
+          <div class="mobile-set-time">${set.start} - ${set.end}</div>
+        </div>
+        <div class="mobile-set-check"></div>
+      `;
+
+      // Load image
+      const avatar = item.querySelector('.mobile-set-avatar');
+      tryLoadArtistImage(avatar, set.artist);
+
+      list.appendChild(item);
+    });
+
+    section.appendChild(list);
+    view.appendChild(section);
+  });
+
   container.appendChild(view);
 }
 
@@ -1895,14 +2105,38 @@ async function saveAsImage() {
       }
     });
 
-    // Download
-    const link = document.createElement('a');
+    // Download - use blob for iOS/mobile compatibility
     const stageName = currentStage === 'ALL' ? 'All_Stages' : currentStage.replace(/\s+/g, '_');
-    link.download = `TML_Thailand_${day.day}_${stageName}.png`;
-    link.href = canvas.toDataURL('image/png');
-    link.click();
+    const fileName = `TML_Thailand_${day.day}_${stageName}.png`;
 
-    showToast('Image saved!');
+    canvas.toBlob(blob => {
+      if (!blob) { showToast('Save failed'); return; }
+
+      // Try native share on mobile (iOS/Android)
+      if (navigator.share && navigator.canShare) {
+        const file = new File([blob], fileName, { type: 'image/png' });
+        if (navigator.canShare({ files: [file] })) {
+          navigator.share({ files: [file], title: 'My TML Picks' })
+            .then(() => showToast('Shared!'))
+            .catch(() => fallbackDownload(blob, fileName));
+          return;
+        }
+      }
+      fallbackDownload(blob, fileName);
+    }, 'image/png');
+
+    function fallbackDownload(blob, name) {
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = name;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      setTimeout(() => URL.revokeObjectURL(url), 1000);
+      showToast('Image saved!');
+    }
+
   } catch (err) {
     console.error('Save failed:', err);
     showToast('Save failed - try again');
@@ -1961,10 +2195,6 @@ document.getElementById('picksModal').addEventListener('click', (e) => {
 });
 
 // ===== INIT =====
-// On mobile, default to Mainstage instead of ALL (too cramped)
-if (window.innerWidth < 768) {
-  currentStage = 'Mainstage';
-}
 loadSelections();
 loadFriendSelections();
 render();
