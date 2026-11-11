@@ -1,0 +1,2000 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>Tomorrowland Thailand 2026 - Timetable</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800;900&family=Cinzel:wght@400;700;900&display=swap');
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg-primary: #06060f;
+  --bg-secondary: #0d0d1a;
+  --bg-card: rgba(255,255,255,0.06);
+  --gold: #d4a843;
+  --gold-light: #f0d078;
+  --gold-dark: #a07828;
+  --text-primary: #f0f0f0;
+  --text-secondary: rgba(255,255,255,0.6);
+  --text-muted: rgba(255,255,255,0.35);
+  --friend-color: #00e5ff;
+  --selected-glow: rgba(212,168,67,0.4);
+  --friend-glow: rgba(0,229,255,0.4);
+  --hour-height: 120px;
+  --stage-mainstage: #FFD700;
+  --stage-freedom: #FF6B35;
+  --stage-core: #00D4AA;
+  --stage-crystal: #9B59B6;
+  --stage-codex: #3498DB;
+  --stage-papillon: #E91E63;
+  --stage-moosebar: #8BC34A;
+}
+
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: 'Montserrat', sans-serif;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  min-height: 100vh;
+  overflow-x: hidden;
+  -webkit-tap-highlight-color: transparent;
+}
+
+body::before {
+  content: '';
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background:
+    radial-gradient(ellipse at 20% 0%, rgba(212,168,67,0.08) 0%, transparent 50%),
+    radial-gradient(ellipse at 80% 100%, rgba(100,50,150,0.08) 0%, transparent 50%),
+    radial-gradient(ellipse at 50% 50%, rgba(20,20,40,1) 0%, var(--bg-primary) 100%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(212,168,67,0.3); border-radius: 3px; }
+
+/* ===== HEADER ===== */
+.festival-header {
+  position: relative;
+  z-index: 10;
+  text-align: center;
+  padding: 24px 16px 12px;
+  background: linear-gradient(180deg, rgba(6,6,15,0.98) 0%, rgba(6,6,15,0.85) 100%);
+}
+
+.festival-logo {
+  font-family: 'Cinzel', serif;
+  font-weight: 900;
+  font-size: clamp(16px, 4.5vw, 28px);
+  letter-spacing: 4px;
+  background: linear-gradient(135deg, var(--gold-light), var(--gold), var(--gold-dark));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  text-transform: uppercase;
+  line-height: 1.3;
+}
+
+.festival-logo small {
+  display: block;
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 300;
+  font-size: 0.45em;
+  letter-spacing: 6px;
+  -webkit-text-fill-color: var(--text-secondary);
+  margin-top: 2px;
+}
+
+/* ===== STICKY CONTROLS ===== */
+.sticky-controls {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: rgba(6,6,15,0.95);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-bottom: 1px solid rgba(212,168,67,0.15);
+  padding-bottom: 4px;
+}
+
+/* Search bar */
+.search-container {
+  padding: 8px 16px 4px;
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.search-input {
+  flex: 1;
+  background: rgba(255,255,255,0.07);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 24px;
+  padding: 8px 16px 8px 36px;
+  color: var(--text-primary);
+  font-size: 14px;
+  font-family: 'Montserrat', sans-serif;
+  outline: none;
+  transition: border-color 0.2s;
+}
+.search-input:focus { border-color: var(--gold); }
+.search-input::placeholder { color: var(--text-muted); }
+
+.search-container .search-icon {
+  position: absolute;
+  left: 28px;
+  color: var(--text-muted);
+  font-size: 14px;
+  pointer-events: none;
+}
+
+.search-container { position: relative; }
+
+/* Day tabs */
+.day-tabs {
+  display: flex;
+  justify-content: center;
+  gap: 4px;
+  padding: 8px 16px 4px;
+}
+
+.day-tab {
+  flex: 1;
+  max-width: 160px;
+  padding: 8px 12px;
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 10px;
+  background: transparent;
+  color: var(--text-secondary);
+  font-family: 'Montserrat', sans-serif;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.25s;
+  text-align: center;
+  line-height: 1.3;
+}
+
+.day-tab span { display: block; font-weight: 400; font-size: 10px; opacity: 0.7; margin-top: 1px; }
+.day-tab.active {
+  background: linear-gradient(135deg, var(--gold-dark), var(--gold));
+  color: #000;
+  border-color: var(--gold);
+  box-shadow: 0 2px 12px rgba(212,168,67,0.3);
+}
+.day-tab.active span { opacity: 0.8; }
+
+/* Stage filter */
+.stage-tabs {
+  display: flex;
+  gap: 6px;
+  padding: 6px 16px 8px;
+  overflow-x: auto;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.stage-tabs::-webkit-scrollbar { display: none; }
+
+.stage-tab {
+  flex-shrink: 0;
+  padding: 5px 12px;
+  border-radius: 16px;
+  border: 1px solid rgba(255,255,255,0.12);
+  background: transparent;
+  color: var(--text-secondary);
+  font-family: 'Montserrat', sans-serif;
+  font-size: 11px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+
+.stage-tab:hover { border-color: rgba(255,255,255,0.25); }
+.stage-tab.active { background: var(--tab-color, #fff); color: #000; border-color: transparent; font-weight: 600; }
+
+/* ===== TIMELINE CONTAINER ===== */
+.timeline-container {
+  position: relative;
+  z-index: 1;
+  padding: 0 8px 60px;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+/* All-stages grid */
+.all-stages-view {
+  display: flex;
+  gap: 0;
+  overflow-x: auto;
+  scrollbar-width: thin;
+  padding-bottom: 8px;
+}
+
+.stage-column {
+  flex-shrink: 0;
+  min-width: 160px;
+  flex: 1;
+  position: relative;
+}
+
+.stage-column-header {
+  position: sticky;
+  top: 0;
+  z-index: 5;
+  text-align: center;
+  padding: 8px 4px;
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  background: rgba(6,6,15,0.9);
+  backdrop-filter: blur(10px);
+  border-bottom: 2px solid var(--col-color);
+  color: var(--col-color);
+}
+
+.stage-column-body {
+  position: relative;
+  /* min-height set dynamically by JS */
+}
+
+/* Single stage view */
+.single-stage-view {
+  max-width: 600px;
+  margin: 0 auto;
+  position: relative;
+}
+
+.single-stage-body {
+  position: relative;
+  /* min-height set dynamically by JS */
+}
+
+/* Hour markers */
+.hour-markers {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  pointer-events: none;
+}
+
+.hour-line {
+  position: absolute;
+  left: 0;
+  right: 0;
+  border-top: 1px dashed rgba(255,255,255,0.18);
+}
+
+.hour-line::after {
+  content: attr(data-label);
+  position: absolute;
+  right: 4px;
+  top: 2px;
+  font-size: 9px;
+  color: rgba(255,255,255,0.2);
+  font-family: 'Montserrat', sans-serif;
+}
+
+.hour-label {
+  position: absolute;
+  left: 4px;
+  transform: translateY(-50%);
+  font-size: 10px;
+  font-weight: 500;
+  color: var(--text-muted);
+  z-index: 2;
+}
+
+/* Time sidebar for single view */
+.time-sidebar {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 48px;
+  bottom: 0;
+}
+
+.time-sidebar .hour-label {
+  left: 0;
+  width: 48px;
+  text-align: right;
+  padding-right: 8px;
+  font-size: 11px;
+}
+
+.single-stage-body .set-cards-area {
+  margin-left: 52px;
+}
+
+/* Current time indicator */
+.now-line {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: #ff2d55;
+  z-index: 10;
+  box-shadow: 0 0 8px rgba(255,45,85,0.6);
+  display: none;
+}
+
+.now-line::before {
+  content: 'NOW';
+  position: absolute;
+  left: 4px;
+  top: -8px;
+  font-size: 8px;
+  font-weight: 800;
+  color: #ff2d55;
+  letter-spacing: 1px;
+}
+
+/* ===== DJ CARDS ===== */
+.dj-card {
+  position: absolute;
+  left: 4px;
+  right: 4px;
+  border-radius: 10px;
+  background: rgba(255,255,255,0.05);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255,255,255,0.08);
+  overflow: hidden;
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 8px 10px;
+  min-height: 44px;
+}
+
+.dj-card::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 3px;
+  background: var(--stage-color);
+}
+
+.dj-card:hover {
+  transform: scale(1.02);
+  border-color: rgba(255,255,255,0.15);
+  box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+  z-index: 5;
+}
+
+.dj-card:active { transform: scale(0.98); }
+
+.dj-card.selected {
+  border-color: var(--gold);
+  background: rgba(212,168,67,0.12);
+  box-shadow: 0 0 20px var(--selected-glow), inset 0 0 20px rgba(212,168,67,0.05);
+}
+
+.dj-card.selected::after {
+  content: '';
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  width: 16px;
+  height: 16px;
+  background: var(--gold);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23000'%3E%3Cpath d='M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z'/%3E%3C/svg%3E");
+  background-size: 12px;
+  background-repeat: no-repeat;
+  background-position: center;
+}
+
+.dj-card.friend-selected {
+  border-color: var(--friend-color);
+  background: rgba(0,229,255,0.08);
+  box-shadow: 0 0 15px var(--friend-glow);
+}
+
+.dj-card.friend-selected.selected {
+  border-image: linear-gradient(135deg, var(--gold), var(--friend-color)) 1;
+  border-style: solid;
+  border-width: 1px;
+  border-radius: 10px;
+}
+
+.dj-card.conflict {
+  background: rgba(255, 45, 85, 0.15) !important;
+  border: 1.5px solid rgba(255, 45, 85, 0.6) !important;
+  box-shadow: 0 0 20px rgba(255, 45, 85, 0.3), inset 0 0 15px rgba(255, 45, 85, 0.1) !important;
+  animation: conflictPulse 2s ease-in-out infinite;
+}
+
+.dj-card.conflict::before {
+  background: #ff2d55 !important;
+  width: 4px;
+}
+
+@keyframes conflictPulse {
+  0%, 100% { box-shadow: 0 0 15px rgba(255, 45, 85, 0.25), inset 0 0 10px rgba(255, 45, 85, 0.08); }
+  50% { box-shadow: 0 0 25px rgba(255, 45, 85, 0.5), inset 0 0 20px rgba(255, 45, 85, 0.15); }
+}
+
+.dj-card.conflict .conflict-badge {
+  animation: badgeBounce 1s ease-in-out infinite;
+}
+
+@keyframes badgeBounce {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.2); }
+}
+
+.dj-card.search-match {
+  border-color: rgba(255,255,255,0.3);
+  box-shadow: 0 0 15px rgba(255,255,255,0.1);
+}
+
+.dj-card.search-dim {
+  opacity: 0.2;
+}
+
+.dj-card-inner {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 0;
+}
+
+.dj-avatar {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  font-weight: 700;
+  color: #000;
+  background: var(--stage-color);
+  overflow: hidden;
+  border: 2px solid rgba(255,255,255,0.2);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+}
+
+.dj-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 50%;
+}
+
+.dj-avatar.small { width: 32px; height: 32px; font-size: 10px; }
+
+.dj-info {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+}
+
+.dj-name {
+  font-size: 12px;
+  font-weight: 600;
+  white-space: normal;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  line-height: 1.3;
+}
+
+.dj-time {
+  font-size: 10px;
+  color: var(--text-secondary);
+  margin-top: 1px;
+}
+
+.dj-stage-tag {
+  font-size: 8px;
+  font-weight: 600;
+  color: var(--stage-color);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-top: 1px;
+}
+
+.dj-card.compact .dj-avatar { width: 28px; height: 28px; font-size: 9px; }
+.dj-card.compact .dj-name { font-size: 11px; }
+.dj-card.compact .dj-time { font-size: 9px; }
+
+.conflict-badge {
+  position: absolute;
+  top: 4px;
+  right: 24px;
+  width: 18px;
+  height: 18px;
+  background: #ff2d55;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 800;
+  color: #fff;
+  display: none;
+}
+
+.dj-card.conflict .conflict-badge { display: flex; }
+
+.dj-card.conflict .dj-time {
+  color: #ff6b8a;
+  font-weight: 600;
+}
+
+.dj-card.conflict .dj-time::after {
+  content: ' CONFLICT';
+  font-size: 8px;
+  font-weight: 800;
+  color: #ff2d55;
+  letter-spacing: 0.5px;
+}
+
+/* ===== FLOATING ACTIONS ===== */
+.floating-actions {
+  position: fixed;
+  bottom: 20px;
+  right: 16px;
+  z-index: 200;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  align-items: flex-end;
+}
+
+.fab {
+  height: 44px;
+  border-radius: 22px;
+  border: none;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 16px;
+  transition: all 0.25s;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+}
+
+.fab-picks {
+  background: linear-gradient(135deg, var(--gold-dark), var(--gold));
+  color: #000;
+}
+
+.fab-picks:hover { box-shadow: 0 4px 25px rgba(212,168,67,0.5); }
+
+.fab-share {
+  background: rgba(255,255,255,0.1);
+  backdrop-filter: blur(12px);
+  color: var(--text-primary);
+  border: 1px solid rgba(255,255,255,0.15);
+}
+
+.fab-share:hover { background: rgba(255,255,255,0.15); }
+
+.fab-save {
+  background: rgba(255,255,255,0.1);
+  backdrop-filter: blur(12px);
+  color: var(--text-primary);
+  border: 1px solid rgba(255,255,255,0.15);
+}
+.fab-save:hover { background: rgba(255,255,255,0.15); }
+.fab-save.saving {
+  pointer-events: none;
+  opacity: 0.6;
+}
+
+.capture-watermark {
+  text-align: center;
+  padding: 16px;
+  font-family: 'Cinzel', serif;
+  font-weight: 700;
+  font-size: 18px;
+  letter-spacing: 3px;
+  background: linear-gradient(135deg, var(--gold-light), var(--gold), var(--gold-dark));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.selection-count {
+  background: #000;
+  color: var(--gold);
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.fab.hidden { display: none; }
+
+/* ===== MY PICKS MODAL ===== */
+.modal-overlay {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0,0,0,0.8);
+  backdrop-filter: blur(8px);
+  z-index: 300;
+  display: none;
+  align-items: flex-end;
+  justify-content: center;
+}
+
+.modal-overlay.open { display: flex; }
+
+.modal {
+  width: 100%;
+  max-width: 500px;
+  max-height: 85vh;
+  background: var(--bg-secondary);
+  border-radius: 20px 20px 0 0;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  animation: slideUp 0.3s ease;
+}
+
+@keyframes slideUp {
+  from { transform: translateY(100%); }
+  to { transform: translateY(0); }
+}
+
+.modal-header {
+  padding: 16px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+}
+
+.modal-title {
+  font-size: 16px;
+  font-weight: 700;
+  font-family: 'Cinzel', serif;
+  color: var(--gold);
+}
+
+.modal-close {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.08);
+  border: none;
+  color: var(--text-primary);
+  font-size: 18px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.modal-body {
+  overflow-y: auto;
+  padding: 12px 16px 24px;
+  flex: 1;
+}
+
+.picks-day-group {
+  margin-bottom: 16px;
+}
+
+.picks-day-label {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--gold);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 8px;
+  padding-left: 4px;
+}
+
+.picks-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  background: rgba(255,255,255,0.04);
+  border-radius: 10px;
+  margin-bottom: 4px;
+  border-left: 3px solid var(--stage-color);
+}
+
+.picks-item .dj-avatar {
+  width: 44px;
+  height: 44px;
+}
+
+.picks-info {
+  flex: 1;
+}
+
+.picks-name {
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.picks-meta {
+  font-size: 11px;
+  color: var(--text-secondary);
+  margin-top: 2px;
+}
+
+.picks-stage {
+  font-size: 10px;
+  color: var(--stage-color);
+  font-weight: 600;
+}
+
+.picks-conflict {
+  color: #ff2d55;
+  font-size: 11px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.no-picks {
+  text-align: center;
+  padding: 40px 20px;
+  color: var(--text-muted);
+  font-size: 14px;
+}
+
+/* ===== TOAST ===== */
+.toast {
+  position: fixed;
+  bottom: 80px;
+  left: 50%;
+  transform: translateX(-50%) translateY(20px);
+  background: rgba(30,30,50,0.95);
+  backdrop-filter: blur(12px);
+  color: var(--text-primary);
+  padding: 10px 20px;
+  border-radius: 12px;
+  font-size: 13px;
+  font-weight: 500;
+  z-index: 400;
+  opacity: 0;
+  transition: opacity 0.3s, transform 0.3s;
+  pointer-events: none;
+  border: 1px solid rgba(255,255,255,0.1);
+}
+
+.toast.show {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
+/* ===== FRIEND BANNER ===== */
+.friend-banner {
+  background: linear-gradient(135deg, rgba(0,229,255,0.1), rgba(0,229,255,0.05));
+  border: 1px solid rgba(0,229,255,0.2);
+  border-radius: 10px;
+  padding: 10px 16px;
+  margin: 8px 16px;
+  display: none;
+  align-items: center;
+  gap: 10px;
+  font-size: 12px;
+  color: var(--friend-color);
+}
+
+.friend-banner.show { display: flex; }
+
+/* Mobile swipe hint */
+.swipe-hint {
+  display: none;
+  text-align: center;
+  padding: 4px 0 2px;
+  font-size: 10px;
+  color: var(--text-muted);
+  letter-spacing: 0.5px;
+}
+@media (max-width: 767px) {
+  .swipe-hint.show { display: block; }
+}
+
+.friend-banner .dismiss {
+  margin-left: auto;
+  background: none;
+  border: none;
+  color: var(--friend-color);
+  cursor: pointer;
+  font-size: 16px;
+  padding: 0 4px;
+}
+
+/* ===== RESPONSIVE ===== */
+
+/* Mobile first (default is mobile) */
+@media (max-width: 767px) {
+  :root { --hour-height: 80px; }
+
+  .festival-header { padding: 12px 12px 6px; }
+  .festival-logo { font-size: 15px; letter-spacing: 2px; }
+  .festival-logo small { font-size: 0.5em; letter-spacing: 3px; }
+
+  .sticky-controls { padding-bottom: 2px; }
+  .search-container { padding: 6px 10px 2px; }
+  .search-input { padding: 6px 12px 6px 32px; font-size: 13px; }
+  .search-container .search-icon { left: 22px; font-size: 13px; }
+
+  .day-tabs { padding: 4px 10px 2px; gap: 3px; }
+  .day-tab { padding: 6px 8px; font-size: 11px; border-radius: 8px; }
+  .day-tab span { font-size: 9px; }
+
+  .stage-tabs { padding: 4px 10px 6px; gap: 4px; }
+  .stage-tab { padding: 4px 10px; font-size: 10px; border-radius: 14px; }
+
+  .timeline-container { padding: 0 4px 100px; }
+
+  /* ALL view: 2-column swipeable grid instead of 7 tiny columns */
+  .all-stages-view { gap: 0; }
+  .stage-column { min-width: 48vw; }
+  .stage-column-header { font-size: 9px; padding: 6px 2px; letter-spacing: 0.5px; }
+
+  .dj-card { left: 2px; right: 2px; padding: 6px 6px; border-radius: 8px; min-height: 38px; }
+  .dj-card-inner { gap: 6px; }
+  .dj-avatar { width: 40px; height: 40px; font-size: 12px; }
+  .dj-avatar.small { width: 28px; height: 28px; font-size: 9px; }
+  .dj-name { font-size: 11px; }
+  .dj-time { font-size: 9px; }
+  .dj-stage-tag { font-size: 7px; }
+
+  .dj-card.selected::after { width: 14px; height: 14px; top: 4px; right: 4px; background-size: 10px; }
+  .conflict-badge { width: 16px; height: 16px; font-size: 10px; top: 3px; right: 20px; }
+
+  .floating-actions { bottom: 12px; right: 10px; gap: 8px; }
+  .fab { height: 38px; font-size: 12px; padding: 0 12px; border-radius: 19px; }
+  .selection-count { width: 20px; height: 20px; font-size: 10px; }
+
+  .modal { border-radius: 16px 16px 0 0; max-height: 80vh; margin: 0; }
+  .modal-header { padding: 14px 16px; }
+  .modal-title { font-size: 15px; }
+  .modal-body { padding: 12px; }
+  .picks-item .dj-avatar { width: 36px; height: 36px; }
+  .picks-name { font-size: 12px; }
+  .picks-meta { font-size: 10px; }
+
+  .hour-line::after { font-size: 8px; }
+
+  .friend-banner { margin: 4px 10px; padding: 8px 12px; font-size: 11px; }
+}
+
+/* Very small phones */
+@media (max-width: 380px) {
+  :root { --hour-height: 70px; }
+  .festival-logo { font-size: 13px; }
+  .dj-avatar { width: 34px; height: 34px; font-size: 10px; }
+  .dj-name { font-size: 10px; }
+  .stage-column { min-width: 44vw; }
+  .stage-tab { padding: 3px 8px; font-size: 9px; }
+  .day-tab { padding: 5px 6px; font-size: 10px; }
+}
+
+/* Tablet */
+@media (min-width: 768px) {
+  .stage-column { min-width: 180px; }
+  .dj-card { left: 6px; right: 6px; padding: 8px 10px; }
+  .dj-name { font-size: 13px; }
+  .dj-avatar { width: 52px; height: 52px; }
+  .hour-label { font-size: 11px; }
+  .day-tab { font-size: 13px; padding: 10px 16px; }
+  .stage-tab { font-size: 12px; padding: 6px 14px; }
+  .modal { border-radius: 20px; margin-bottom: 40px; max-height: 70vh; }
+  .modal-overlay { align-items: center; }
+  :root { --hour-height: 100px; }
+}
+
+/* Desktop */
+@media (min-width: 1024px) {
+  .stage-column { min-width: 170px; }
+  .dj-avatar { width: 56px; height: 56px; }
+  :root { --hour-height: 90px; }
+}
+</style>
+</head>
+<body>
+
+<!-- Header -->
+<div class="festival-header">
+  <div class="festival-logo">
+    Tomorrowland Thailand
+    <small>December 11 - 13, 2026</small>
+  </div>
+</div>
+
+<!-- Sticky Controls -->
+<div class="sticky-controls">
+  <div class="search-container">
+    <span class="search-icon">&#128269;</span>
+    <input type="text" class="search-input" placeholder="Search DJ..." id="searchInput">
+  </div>
+  <div class="day-tabs" id="dayTabs"></div>
+  <div class="stage-tabs" id="stageTabs"></div>
+</div>
+
+<!-- Friend banner -->
+<div class="friend-banner" id="friendBanner">
+  <span>&#128101;</span>
+  <span>Viewing a friend's picks (shown in <b>cyan</b>)</span>
+  <button class="dismiss" onclick="dismissFriendBanner()">&times;</button>
+</div>
+
+<!-- Swipe Hint -->
+<div class="swipe-hint" id="swipeHint">&#8592; swipe to change stage &#8594;</div>
+
+<!-- Timeline -->
+<div class="timeline-container" id="timelineContainer"></div>
+
+<!-- Floating Actions -->
+<div class="floating-actions">
+  <button class="fab fab-save" id="saveBtn" onclick="saveAsImage()">
+    <span>&#128247;</span> Save Image
+  </button>
+  <button class="fab fab-share" id="shareBtn" onclick="sharePicks()">
+    <span>&#128279;</span> Share
+  </button>
+  <button class="fab fab-picks" id="picksBtn" onclick="openPicks()">
+    <span>&#9733;</span> My Picks <span class="selection-count" id="selCount">0</span>
+  </button>
+</div>
+
+<!-- My Picks Modal -->
+<div class="modal-overlay" id="picksModal">
+  <div class="modal">
+    <div class="modal-header">
+      <span class="modal-title">&#9733; My Picks</span>
+      <button class="modal-close" onclick="closePicks()">&times;</button>
+    </div>
+    <div class="modal-body" id="picksBody"></div>
+  </div>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<script>
+// ===== DATA =====
+
+// Name-to-filename mapping for mismatched cases
+// artist name → { file, ext } mapping for names that don't match directly
+const DJ_FILE_MAP = {
+  "Halö": { file: "HALŌ", ext: "webp" },
+  "AdamK": { file: "ADAM K", ext: "webp" },
+  "TA:REK": { file: "TAREK", ext: "jpg" },
+  "Somna": { file: "Somnia", ext: "webp" },
+  "Alok": { file: "ALOK", ext: "webp" },
+  "Apashe": { file: "APASHE", ext: "webp" },
+  "Arten": { file: "ARTEN", ext: "webp" },
+  "DJ Boring": { file: "DJ BORING", ext: "webp" },
+  "Elfigo": { file: "ELFIGO", ext: "webp" },
+  "Joulie": { file: "JOULIE", ext: "webp" },
+  "Karty": { file: "KARTY", ext: "webp" },
+  "Mandy": { file: "MANDY", ext: "webp" },
+  "Nervo": { file: "NERVO", ext: "webp" },
+  "Nome.": { file: "NOME.", ext: "webp" },
+  "Nuttrix": { file: "NUTTRIX", ext: "webp" },
+  "R3HAB": { file: "R3hab", ext: "webp" },
+  "Row1": { file: "ROW1", ext: "webp" },
+  "Sabai": { file: "SABAI", ext: "webp" },
+  "Alan Walker": { file: "AlanWalker", ext: "jpg" },
+  "Anika": { file: "Anika", ext: "jpg" },
+  "CamelPhat": { file: "CamelPhat", ext: "jpg" },
+  "Claudine": { file: "Claudine", ext: "jpg" },
+  "Dadoo": { file: "Dadoo", ext: "jpg" },
+  "J-Nana": { file: "J-nana", ext: "jpg" },
+  "Jelle DK": { file: "Jelle DK", ext: "jpg" },
+  "Jijie": { file: "Jijie", ext: "jpg" },
+  "JoWaves": { file: "JoWaves", ext: "jpg" },
+  "Linska": { file: "Linska", ext: "jpg" },
+  "Lora Matia": { file: "Lora Matia", ext: "jpg" },
+  "Luuk Van Dijk": { file: "Luuk Van Dijk", ext: "jpg" },
+  "Maxi Meraki": { file: "MAXI MERAKI", ext: "jpg" },
+  "Marsh": { file: "Marsh", ext: "jpg" },
+  "Maysaa": { file: "Maysaa", ext: "jpg" },
+  "Meltmode": { file: "MeltMode", ext: "jpg" },
+  "Mike Bond": { file: "Mikebond", ext: "jpg" },
+  "Onfaya": { file: "Onfaya", ext: "jpg" },
+  "Raiden": { file: "Raiden", ext: "jpg" },
+  "Rave Republic": { file: "RaveRepublic", ext: "jpg" },
+  "Saint Ludo": { file: "Saintludo", ext: "jpg" },
+  "Sm1le": { file: "Sm1le", ext: "jpg" },
+  "Solardo": { file: "Solardo", ext: "jpg" },
+  "Vicky Kroon": { file: "VickyKroon", ext: "jpg" },
+  "X Club.": { file: "XClub.", ext: "jpg" },
+  "Yellow Claw": { file: "YelloClaw", ext: "jpg" },
+  "Youna": { file: "Youna", ext: "jpg" }
+};
+
+// Known files in DJ/ folder — only attempt image load for these
+const DJ_FILES = new Set([
+  "22 Bullets","ADAM K","ALOK","APASHE","ARTBAT","ARTEN","Afrojack",
+  "Agents of Time","Amy Wiles","Amémé","Andromedik","Angemi","Bassjackers",
+  "Bibi Seck","Blazy","Botcash","Brennan Heart","Camila Jun","Capoon",
+  "Carly Wilford","Coco Bevan","Cosmic Gate","DJ BORING","DJ Licious",
+  "DJ Sally","DJ Tennis","DVBBS","Da Tweekaz","Dennis Gold",
+  "Dimitri Vegas & Like Mike","Dino Lenny","Dubvision","ELFIGO",
+  "Ferry Corsten","Firaga","Funk Tribu","Ghost Rider","Goldfish","HALŌ",
+  "Halo","Hannah Laing","Henri Bergmann","Henri PFR","Honey Gee","Hyalyte",
+  "Ian Asher","Infected Mushroom","JOULIE","Jan V","Jerrooo","John Newman",
+  "Jonnie B","Joris Voorn","KARTY","Kevin de Vries","Kryder","Kölsch",
+  "Laidback Luke","Lennert Wolfs","Lilly Palmer","Lonskii","Lost Frequencies",
+  "Lucas & Steve","Luna & Lenthe","MANDY","MATTN","Makasi","Manuals",
+  "Martin Garrix","Matisse & Sadko","Meaghan","Meguru","Merow","Mind Against",
+  "Miss Monique","NERVO","NOME.","NUTTRIX","Nakadia","Neon","Netsky",
+  "Nico Moreno","Novah","Oppidan","Palmera","Pegassi","Pixzy","Puffer P",
+  "Quintino","R3hab","ROW1","RayRay","Riviere","Romeo Blanco","SABAI",
+  "Semsei","Somnia","Space 92","Steve Aoki","Sub Zero Project",
+  "Swedish House Mafia","Third Party","Tiger Drama","Tripical Note","Vegas",
+  "Vini Vici","WHITENO1SE","Whisnu Santika","Wukong","Xenia Dia","Yotto",
+  "Yukio","Yves V"
+]);
+
+function tryLoadArtistImage(avatar, artistName) {
+  // Build candidate list: { file, ext } pairs
+  const candidates = [];
+
+  // 1. Check explicit mapping (has exact file + ext)
+  if (DJ_FILE_MAP[artistName]) {
+    candidates.push(DJ_FILE_MAP[artistName]);
+  }
+
+  // 2. Exact name as webp
+  const clean = artistName.replace(/[\/\\?%*:|"<>]/g, '');
+  if (DJ_FILES.has(clean)) {
+    candidates.push({ file: clean, ext: 'webp' });
+  }
+
+  // 3. For B2B acts, try first then second artist
+  if (artistName.includes(' B2B ')) {
+    const parts = artistName.split(' B2B ');
+    const first = parts[0].trim();
+    const second = parts[1] ? parts[1].trim() : '';
+    if (DJ_FILE_MAP[first]) candidates.push(DJ_FILE_MAP[first]);
+    if (second && DJ_FILE_MAP[second]) candidates.push(DJ_FILE_MAP[second]);
+    if (DJ_FILES.has(first)) candidates.push({ file: first, ext: 'webp' });
+    if (second && DJ_FILES.has(second)) candidates.push({ file: second, ext: 'webp' });
+  }
+
+  if (candidates.length === 0) return;
+
+  // Try candidates in order
+  function tryNext(idx) {
+    if (idx >= candidates.length) return;
+    const c = candidates[idx];
+    const img = new Image();
+    img.src = `DJ/${c.file}.${c.ext}`;
+    img.onload = () => { avatar.innerHTML = `<img src="${img.src}" alt="${artistName}">`; };
+    img.onerror = () => tryNext(idx + 1);
+  }
+  tryNext(0);
+}
+
+const TIMETABLE = {
+  "festival": "Tomorrowland Thailand 2026",
+  "stages": ["Mainstage", "Freedom by Bud", "Core", "Crystal Garden by Anker", "Codex", "Papillon", "Moosebar"],
+  "days": [
+    {
+      "date": "2026-12-11",
+      "day": "Friday",
+      "sets": [
+        { "stage": "Mainstage", "artist": "Goldfish", "start": "13:00", "end": "14:25" },
+        { "stage": "Mainstage", "artist": "Rave Republic", "start": "14:25", "end": "15:25" },
+        { "stage": "Mainstage", "artist": "Youna", "start": "15:25", "end": "16:25" },
+        { "stage": "Mainstage", "artist": "Henri PFR", "start": "16:30", "end": "17:30" },
+        { "stage": "Mainstage", "artist": "Lilly Palmer", "start": "17:35", "end": "18:35" },
+        { "stage": "Mainstage", "artist": "John Newman", "start": "18:35", "end": "19:35" },
+        { "stage": "Mainstage", "artist": "Kevin de Vries", "start": "19:40", "end": "20:40" },
+        { "stage": "Mainstage", "artist": "Hal\u00f6", "start": "20:40", "end": "21:40" },
+        { "stage": "Mainstage", "artist": "Vini Vici", "start": "21:45", "end": "22:45" },
+        { "stage": "Mainstage", "artist": "Alan Walker", "start": "22:50", "end": "23:50" },
+        { "stage": "Mainstage", "artist": "Martin Garrix", "start": "23:50", "end": "00:50" },
+        { "stage": "Freedom by Bud", "artist": "Mike Bond", "start": "13:00", "end": "14:30" },
+        { "stage": "Freedom by Bud", "artist": "Sm1le", "start": "14:30", "end": "16:00" },
+        { "stage": "Freedom by Bud", "artist": "Kryder", "start": "16:00", "end": "17:30" },
+        { "stage": "Freedom by Bud", "artist": "Raiden", "start": "17:30", "end": "19:00" },
+        { "stage": "Freedom by Bud", "artist": "Honey Gee", "start": "19:00", "end": "20:00" },
+        { "stage": "Freedom by Bud", "artist": "Wukong", "start": "20:00", "end": "21:00" },
+        { "stage": "Freedom by Bud", "artist": "Bassjackers", "start": "21:00", "end": "22:00" },
+        { "stage": "Freedom by Bud", "artist": "Mandy", "start": "22:00", "end": "23:00" },
+        { "stage": "Freedom by Bud", "artist": "Da Tweekaz", "start": "23:00", "end": "00:00" },
+        { "stage": "Freedom by Bud", "artist": "Flosstradamus B2B Yellow Claw", "start": "00:00", "end": "01:00" },
+        { "stage": "Core", "artist": "Claudine", "start": "13:00", "end": "14:30" },
+        { "stage": "Core", "artist": "Hyalyte", "start": "14:30", "end": "16:00" },
+        { "stage": "Core", "artist": "Saint Ludo", "start": "16:00", "end": "17:30" },
+        { "stage": "Core", "artist": "Oppidan", "start": "17:30", "end": "19:00" },
+        { "stage": "Core", "artist": "Pegassi", "start": "19:00", "end": "21:00" },
+        { "stage": "Core", "artist": "X Club.", "start": "21:00", "end": "23:00" },
+        { "stage": "Core", "artist": "Funk Tribu", "start": "23:00", "end": "01:00" },
+        { "stage": "Crystal Garden by Anker", "artist": "Jonnie B", "start": "13:30", "end": "15:00" },
+        { "stage": "Crystal Garden by Anker", "artist": "Lonskii", "start": "15:00", "end": "16:30" },
+        { "stage": "Crystal Garden by Anker", "artist": "Amy Wiles", "start": "16:30", "end": "18:00" },
+        { "stage": "Crystal Garden by Anker", "artist": "Marsh", "start": "18:00", "end": "19:30" },
+        { "stage": "Crystal Garden by Anker", "artist": "Eli & Fur B2B Yotto", "start": "19:30", "end": "21:00" },
+        { "stage": "Crystal Garden by Anker", "artist": "Cosmic Gate", "start": "21:00", "end": "22:00" },
+        { "stage": "Crystal Garden by Anker", "artist": "Aly & Fila", "start": "22:00", "end": "23:30" },
+        { "stage": "Crystal Garden by Anker", "artist": "Ferry Corsten B2B Marsh", "start": "23:30", "end": "00:00" },
+        { "stage": "Crystal Garden by Anker", "artist": "Ferry Corsten", "start": "00:00", "end": "01:00" },
+        { "stage": "Codex", "artist": "Dadoo", "start": "13:30", "end": "15:00" },
+        { "stage": "Codex", "artist": "DJ Licious", "start": "15:00", "end": "16:30" },
+        { "stage": "Codex", "artist": "Camila Jun", "start": "16:30", "end": "18:00" },
+        { "stage": "Codex", "artist": "Elfigo", "start": "18:00", "end": "19:30" },
+        { "stage": "Codex", "artist": "Linska", "start": "19:30", "end": "21:00" },
+        { "stage": "Codex", "artist": "Solardo", "start": "21:00", "end": "22:30" },
+        { "stage": "Codex", "artist": "CamelPhat", "start": "22:30", "end": "00:00" },
+        { "stage": "Papillon", "artist": "Jijie", "start": "13:30", "end": "15:00" },
+        { "stage": "Papillon", "artist": "Vicky Kroon", "start": "15:00", "end": "17:00" },
+        { "stage": "Papillon", "artist": "Makasi", "start": "17:00", "end": "19:00" },
+        { "stage": "Papillon", "artist": "Palmera", "start": "19:00", "end": "20:30" },
+        { "stage": "Papillon", "artist": "Lennert Wolfs", "start": "20:30", "end": "22:00" },
+        { "stage": "Papillon", "artist": "TA:REK", "start": "22:00", "end": "00:00" },
+        { "stage": "Moosebar", "artist": "Jelle DK", "start": "15:00", "end": "17:00" },
+        { "stage": "Moosebar", "artist": "Jan V", "start": "17:00", "end": "21:00" },
+        { "stage": "Moosebar", "artist": "Jerrooo", "start": "21:00", "end": "01:00" }
+      ]
+    },
+    {
+      "date": "2026-12-12",
+      "day": "Saturday",
+      "sets": [
+        { "stage": "Mainstage", "artist": "Riviere", "start": "13:00", "end": "14:25" },
+        { "stage": "Mainstage", "artist": "Karty", "start": "14:25", "end": "15:25" },
+        { "stage": "Mainstage", "artist": "Meaghan", "start": "15:25", "end": "16:25" },
+        { "stage": "Mainstage", "artist": "Ian Asher", "start": "16:30", "end": "17:30" },
+        { "stage": "Mainstage", "artist": "Miss Monique", "start": "17:35", "end": "18:35" },
+        { "stage": "Mainstage", "artist": "Nervo", "start": "18:35", "end": "19:35" },
+        { "stage": "Mainstage", "artist": "Sub Zero Project", "start": "19:40", "end": "20:40" },
+        { "stage": "Mainstage", "artist": "ARTBAT", "start": "20:40", "end": "21:40" },
+        { "stage": "Mainstage", "artist": "Afrojack", "start": "21:45", "end": "22:45" },
+        { "stage": "Mainstage", "artist": "Dimitri Vegas & Like Mike", "start": "22:50", "end": "23:50" },
+        { "stage": "Mainstage", "artist": "Steve Aoki", "start": "23:50", "end": "00:50" },
+        { "stage": "Freedom by Bud", "artist": "Row1", "start": "13:00", "end": "14:30" },
+        { "stage": "Freedom by Bud", "artist": "XY", "start": "14:30", "end": "16:00" },
+        { "stage": "Freedom by Bud", "artist": "Meguru", "start": "16:00", "end": "18:00" },
+        { "stage": "Freedom by Bud", "artist": "Nakadia", "start": "18:00", "end": "19:30" },
+        { "stage": "Freedom by Bud", "artist": "Amber Broos B2B Space 92", "start": "19:30", "end": "21:00" },
+        { "stage": "Freedom by Bud", "artist": "Hannah Laing", "start": "21:00", "end": "22:30" },
+        { "stage": "Freedom by Bud", "artist": "Nico Moreno", "start": "22:30", "end": "00:00" },
+        { "stage": "Core", "artist": "Anika", "start": "13:00", "end": "15:00" },
+        { "stage": "Core", "artist": "Meltmode", "start": "15:00", "end": "17:00" },
+        { "stage": "Core", "artist": "Bibi Seck", "start": "17:00", "end": "19:00" },
+        { "stage": "Core", "artist": "Luuk Van Dijk", "start": "19:00", "end": "20:30" },
+        { "stage": "Core", "artist": "DJ Boring B2B Luuk Van Dijk", "start": "20:30", "end": "21:30" },
+        { "stage": "Core", "artist": "DJ Boring", "start": "21:30", "end": "23:00" },
+        { "stage": "Core", "artist": "Mind Against", "start": "23:00", "end": "01:00" },
+        { "stage": "Crystal Garden by Anker", "artist": "Puffer P", "start": "13:00", "end": "14:30" },
+        { "stage": "Crystal Garden by Anker", "artist": "Tripical Note", "start": "14:30", "end": "16:00" },
+        { "stage": "Crystal Garden by Anker", "artist": "Firaga", "start": "16:00", "end": "17:30" },
+        { "stage": "Crystal Garden by Anker", "artist": "Ghost Rider", "start": "17:30", "end": "19:00" },
+        { "stage": "Crystal Garden by Anker", "artist": "Somna", "start": "19:00", "end": "20:00" },
+        { "stage": "Crystal Garden by Anker", "artist": "Blazy", "start": "20:00", "end": "21:00" },
+        { "stage": "Crystal Garden by Anker", "artist": "Blastoyz B2B Whitenoise", "start": "21:00", "end": "22:00" },
+        { "stage": "Crystal Garden by Anker", "artist": "Vegas", "start": "22:00", "end": "23:00" },
+        { "stage": "Crystal Garden by Anker", "artist": "Mad Maxx B2B Stryker", "start": "23:00", "end": "00:00" },
+        { "stage": "Crystal Garden by Anker", "artist": "Infected Mushroom", "start": "00:00", "end": "01:00" },
+        { "stage": "Codex", "artist": "Petra", "start": "13:00", "end": "14:30" },
+        { "stage": "Codex", "artist": "Romeo Blanco", "start": "14:30", "end": "16:00" },
+        { "stage": "Codex", "artist": "Manuals", "start": "16:00", "end": "17:30" },
+        { "stage": "Codex", "artist": "Nome.", "start": "17:30", "end": "19:00" },
+        { "stage": "Codex", "artist": "DJ Sally", "start": "19:00", "end": "20:00" },
+        { "stage": "Codex", "artist": "22 Bullets", "start": "20:00", "end": "21:00" },
+        { "stage": "Codex", "artist": "Dubvision", "start": "21:00", "end": "22:00" },
+        { "stage": "Codex", "artist": "Yves V", "start": "22:00", "end": "23:00" },
+        { "stage": "Codex", "artist": "Third Party", "start": "23:00", "end": "00:00" },
+        { "stage": "Codex", "artist": "DVBBS", "start": "00:00", "end": "01:00" },
+        { "stage": "Papillon", "artist": "Arten", "start": "13:00", "end": "15:00" },
+        { "stage": "Papillon", "artist": "Semsei", "start": "15:00", "end": "17:00" },
+        { "stage": "Papillon", "artist": "Rebeca Ark", "start": "17:00", "end": "19:00" },
+        { "stage": "Papillon", "artist": "DJ Licious", "start": "19:00", "end": "21:00" },
+        { "stage": "Papillon", "artist": "Carly Wilford", "start": "21:00", "end": "22:30" },
+        { "stage": "Papillon", "artist": "Coco Bevan", "start": "22:30", "end": "00:00" },
+        { "stage": "Moosebar", "artist": "Jan V", "start": "15:00", "end": "17:00" },
+        { "stage": "Moosebar", "artist": "Jerrooo", "start": "17:00", "end": "21:00" },
+        { "stage": "Moosebar", "artist": "Jelle DK", "start": "21:00", "end": "01:00" }
+      ]
+    },
+    {
+      "date": "2026-12-13",
+      "day": "Sunday",
+      "sets": [
+        { "stage": "Mainstage", "artist": "Nuttrix", "start": "13:00", "end": "14:25" },
+        { "stage": "Mainstage", "artist": "Halo", "start": "14:25", "end": "15:25" },
+        { "stage": "Mainstage", "artist": "Botcash", "start": "15:25", "end": "16:25" },
+        { "stage": "Mainstage", "artist": "MATTN", "start": "16:30", "end": "17:30" },
+        { "stage": "Mainstage", "artist": "K\u00f6lsch", "start": "17:35", "end": "18:35" },
+        { "stage": "Mainstage", "artist": "Novah", "start": "18:35", "end": "19:35" },
+        { "stage": "Mainstage", "artist": "R3HAB", "start": "19:40", "end": "20:40" },
+        { "stage": "Mainstage", "artist": "Alok", "start": "20:40", "end": "21:40" },
+        { "stage": "Mainstage", "artist": "Lost Frequencies", "start": "21:45", "end": "22:45" },
+        { "stage": "Mainstage", "artist": "Swedish House Mafia", "start": "22:50", "end": "23:50" },
+        { "stage": "Freedom by Bud", "artist": "Yukio", "start": "13:00", "end": "15:00" },
+        { "stage": "Freedom by Bud", "artist": "Xenia Dia", "start": "15:00", "end": "16:30" },
+        { "stage": "Freedom by Bud", "artist": "Luna & Lenthe", "start": "16:30", "end": "18:00" },
+        { "stage": "Freedom by Bud", "artist": "Henri Bergmann", "start": "18:00", "end": "19:30" },
+        { "stage": "Freedom by Bud", "artist": "Agents of Time", "start": "19:30", "end": "21:00" },
+        { "stage": "Freedom by Bud", "artist": "Kevin de Vries B2B Morten", "start": "21:00", "end": "22:30" },
+        { "stage": "Freedom by Bud", "artist": "ARTBAT B2B R3HAB", "start": "22:30", "end": "00:00" },
+        { "stage": "Core", "artist": "Dennis Gold", "start": "13:00", "end": "15:00" },
+        { "stage": "Core", "artist": "Capoon", "start": "15:00", "end": "16:30" },
+        { "stage": "Core", "artist": "Dino Lenny", "start": "16:30", "end": "18:00" },
+        { "stage": "Core", "artist": "Maxi Meraki", "start": "18:00", "end": "19:30" },
+        { "stage": "Core", "artist": "Am\u00e9m\u00e9 B2B Honeyluv", "start": "19:30", "end": "21:00" },
+        { "stage": "Core", "artist": "DJ Tennis", "start": "21:00", "end": "22:30" },
+        { "stage": "Core", "artist": "Joris Voorn B2B Krystal Klear", "start": "22:30", "end": "00:00" },
+        { "stage": "Crystal Garden by Anker", "artist": "Lora Matia", "start": "13:00", "end": "14:30" },
+        { "stage": "Crystal Garden by Anker", "artist": "Angemi", "start": "14:30", "end": "16:00" },
+        { "stage": "Crystal Garden by Anker", "artist": "Tiger Drama", "start": "16:00", "end": "17:30" },
+        { "stage": "Crystal Garden by Anker", "artist": "Whisnu Santika", "start": "17:30", "end": "18:30" },
+        { "stage": "Crystal Garden by Anker", "artist": "Matisse & Sadko", "start": "18:30", "end": "19:30" },
+        { "stage": "Crystal Garden by Anker", "artist": "Lucas & Steve", "start": "19:30", "end": "20:30" },
+        { "stage": "Crystal Garden by Anker", "artist": "Laidback Luke", "start": "20:30", "end": "22:00" },
+        { "stage": "Crystal Garden by Anker", "artist": "Quintino", "start": "22:00", "end": "23:00" },
+        { "stage": "Crystal Garden by Anker", "artist": "Brennan Heart", "start": "23:00", "end": "00:00" },
+        { "stage": "Codex", "artist": "J-Nana", "start": "13:00", "end": "14:30" },
+        { "stage": "Codex", "artist": "Maysaa", "start": "14:30", "end": "16:00" },
+        { "stage": "Codex", "artist": "Pixzy", "start": "16:00", "end": "17:00" },
+        { "stage": "Codex", "artist": "Merow", "start": "17:00", "end": "18:00" },
+        { "stage": "Codex", "artist": "RayRay", "start": "18:00", "end": "19:00" },
+        { "stage": "Codex", "artist": "Sabai", "start": "19:00", "end": "20:00" },
+        { "stage": "Codex", "artist": "Andromedik", "start": "20:00", "end": "21:00" },
+        { "stage": "Codex", "artist": "Apashe", "start": "21:00", "end": "22:00" },
+        { "stage": "Codex", "artist": "Netsky", "start": "22:00", "end": "23:00" },
+        { "stage": "Codex", "artist": "Yellow Claw", "start": "23:00", "end": "00:00" },
+        { "stage": "Papillon", "artist": "Joulie", "start": "13:00", "end": "15:00" },
+        { "stage": "Papillon", "artist": "Neon", "start": "15:00", "end": "17:00" },
+        { "stage": "Papillon", "artist": "More to be announced", "start": "17:00", "end": "18:30" },
+        { "stage": "Papillon", "artist": "Onfaya", "start": "18:30", "end": "20:00" },
+        { "stage": "Papillon", "artist": "AdamK", "start": "20:00", "end": "21:30" },
+        { "stage": "Papillon", "artist": "JoWaves", "start": "21:30", "end": "23:00" },
+        { "stage": "Moosebar", "artist": "Jerrooo", "start": "13:00", "end": "17:00" },
+        { "stage": "Moosebar", "artist": "Jelle DK", "start": "17:00", "end": "21:00" },
+        { "stage": "Moosebar", "artist": "Jan V", "start": "21:00", "end": "00:00" }
+      ]
+    }
+  ]
+};
+
+// ===== STAGE COLORS =====
+const STAGE_COLORS = {
+  'Mainstage': '#FFD700',
+  'Freedom by Bud': '#FF6B35',
+  'Core': '#00D4AA',
+  'Crystal Garden by Anker': '#9B59B6',
+  'Codex': '#3498DB',
+  'Papillon': '#E91E63',
+  'Moosebar': '#8BC34A'
+};
+
+const STAGE_SHORT = {
+  'Mainstage': 'Mainstage',
+  'Freedom by Bud': 'Freedom',
+  'Core': 'Core',
+  'Crystal Garden by Anker': 'Crystal Garden',
+  'Codex': 'Codex',
+  'Papillon': 'Papillon',
+  'Moosebar': 'Moosebar'
+};
+
+// ===== STATE =====
+let currentDay = 0;
+let currentStage = 'ALL';
+let selections = new Set();
+let friendSelections = new Set();
+let searchQuery = '';
+
+// ===== TIME HELPERS =====
+const BASE_START = 13; // earliest possible start
+
+function getTimelineStartForDay(dayIdx) {
+  const day = TIMETABLE.days[dayIdx];
+  let minStartRaw = Infinity;
+  day.sets.forEach(s => {
+    const [h, m] = s.start.split(':').map(Number);
+    let hours = h;
+    if (h < BASE_START) hours += 24;
+    const raw = (hours - BASE_START) * 60 + m;
+    if (raw < minStartRaw) minStartRaw = raw;
+  });
+  // Round down to previous full hour
+  return Math.floor(minStartRaw / 60);
+}
+
+function getTimelineEndForDay(dayIdx) {
+  const day = TIMETABLE.days[dayIdx];
+  let maxEndMin = 0;
+  day.sets.forEach(s => {
+    const [h, m] = s.end.split(':').map(Number);
+    let hours = h;
+    if (h < BASE_START) hours += 24;
+    const raw = (hours - BASE_START) * 60 + m;
+    if (raw > maxEndMin) maxEndMin = raw;
+  });
+  // Round up to next full hour
+  return Math.ceil(maxEndMin / 60);
+}
+
+function currentTimelineStart() {
+  return BASE_START + getTimelineStartForDay(currentDay);
+}
+
+function currentTimelineHours() {
+  return getTimelineEndForDay(currentDay) - getTimelineStartForDay(currentDay);
+}
+
+function currentTimelineOffsetMin() {
+  return getTimelineStartForDay(currentDay) * 60;
+}
+
+function timeToMinutesRaw(timeStr) {
+  const [h, m] = timeStr.split(':').map(Number);
+  let hours = h;
+  if (h < BASE_START) hours += 24;
+  return (hours - BASE_START) * 60 + m;
+}
+
+function timeToMinutes(timeStr) {
+  const [h, m] = timeStr.split(':').map(Number);
+  let hours = h;
+  if (h < BASE_START) hours += 24;
+  return (hours - BASE_START) * 60 + m - currentTimelineOffsetMin();
+}
+
+function minutesToPx(minutes) {
+  const hourHeight = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--hour-height'));
+  const totalPx = currentTimelineHours() * hourHeight;
+  return totalPx - (minutes / 60) * hourHeight;
+}
+
+function minutesToPxHeight(minutes) {
+  const hourHeight = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--hour-height'));
+  return (minutes / 60) * hourHeight;
+}
+
+function formatTime(timeStr) {
+  return timeStr;
+}
+
+function getSetKey(dayIdx, artist, stage) {
+  return `${dayIdx}|${artist}|${stage}`;
+}
+
+function getInitials(name) {
+  // Handle B2B names
+  const clean = name.replace(/B2B/g, '&');
+  const words = clean.split(/[\s&]+/).filter(w => w.length > 0);
+  if (words.length === 1) return words[0].substring(0, 2).toUpperCase();
+  return (words[0][0] + words[words.length - 1][0]).toUpperCase();
+}
+
+// ===== PERSISTENCE =====
+function loadSelections() {
+  try {
+    const saved = localStorage.getItem('tml_th_2026_selections');
+    if (saved) selections = new Set(JSON.parse(saved));
+  } catch(e) {}
+}
+
+function saveSelections() {
+  localStorage.setItem('tml_th_2026_selections', JSON.stringify([...selections]));
+}
+
+// ===== URL SHARING =====
+function encodeSelections(sel) {
+  return btoa(JSON.stringify([...sel]));
+}
+
+function decodeSelections(hash) {
+  try {
+    return new Set(JSON.parse(atob(hash)));
+  } catch(e) { return new Set(); }
+}
+
+function loadFriendSelections() {
+  const hash = window.location.hash.slice(1);
+  if (hash) {
+    friendSelections = decodeSelections(hash);
+    if (friendSelections.size > 0) {
+      document.getElementById('friendBanner').classList.add('show');
+    }
+  }
+}
+
+function dismissFriendBanner() {
+  document.getElementById('friendBanner').classList.remove('show');
+}
+
+// ===== CONFLICT DETECTION =====
+function getSelectedSetsForDay(dayIdx) {
+  const day = TIMETABLE.days[dayIdx];
+  return day.sets.filter(s => selections.has(getSetKey(dayIdx, s.artist, s.stage)));
+}
+
+function findConflicts(dayIdx) {
+  const selected = getSelectedSetsForDay(dayIdx);
+  const conflicts = new Set();
+  for (let i = 0; i < selected.length; i++) {
+    for (let j = i + 1; j < selected.length; j++) {
+      const a = selected[i], b = selected[j];
+      const aStart = timeToMinutes(a.start), aEnd = timeToMinutes(a.end);
+      const bStart = timeToMinutes(b.start), bEnd = timeToMinutes(b.end);
+      if (aStart < bEnd && bStart < aEnd) {
+        conflicts.add(getSetKey(dayIdx, a.artist, a.stage));
+        conflicts.add(getSetKey(dayIdx, b.artist, b.stage));
+      }
+    }
+  }
+  return conflicts;
+}
+
+// ===== RENDER =====
+function renderDayTabs() {
+  const container = document.getElementById('dayTabs');
+  container.innerHTML = TIMETABLE.days.map((day, i) => {
+    const date = new Date(day.date + 'T00:00:00');
+    const dateStr = `${date.getMonth() + 1}/${date.getDate()}`;
+    return `<button class="day-tab ${i === currentDay ? 'active' : ''}" onclick="selectDay(${i})">
+      ${day.day}<span>${dateStr}</span>
+    </button>`;
+  }).join('');
+}
+
+function renderStageTabs() {
+  const container = document.getElementById('stageTabs');
+  let html = `<button class="stage-tab ${currentStage === 'ALL' ? 'active' : ''}"
+    style="--tab-color: var(--gold)" onclick="selectStage('ALL')">ALL</button>`;
+  TIMETABLE.stages.forEach(stage => {
+    const color = STAGE_COLORS[stage];
+    const short = STAGE_SHORT[stage];
+    html += `<button class="stage-tab ${currentStage === stage ? 'active' : ''}"
+      style="--tab-color: ${color}" onclick="selectStage('${stage}')">${short}</button>`;
+  });
+  container.innerHTML = html;
+}
+
+function createDjCard(set, dayIdx, isAllView) {
+  const key = getSetKey(dayIdx, set.artist, set.stage);
+  const isSelected = selections.has(key);
+  const isFriend = friendSelections.has(key);
+  const conflicts = findConflicts(dayIdx);
+  const isConflict = conflicts.has(key);
+  const color = STAGE_COLORS[set.stage];
+
+  const startMin = timeToMinutes(set.start);
+  const endMin = timeToMinutes(set.end);
+  const durationMin = endMin - startMin;
+  const topPx = minutesToPx(endMin);
+  const heightPx = minutesToPxHeight(durationMin);
+
+  const isCompact = heightPx < 50;
+  const isSearchMatch = searchQuery && set.artist.toLowerCase().includes(searchQuery.toLowerCase());
+  const isSearchDim = searchQuery && !isSearchMatch;
+
+  const classes = [
+    'dj-card',
+    isSelected ? 'selected' : '',
+    isFriend ? 'friend-selected' : '',
+    isConflict && isSelected ? 'conflict' : '',
+    isCompact ? 'compact' : '',
+    isSearchMatch ? 'search-match' : '',
+    isSearchDim ? 'search-dim' : ''
+  ].filter(Boolean).join(' ');
+
+  const avatarSize = isCompact ? 'small' : '';
+
+  const card = document.createElement('div');
+  card.className = classes;
+  card.style.cssText = `top: ${topPx}px; height: ${heightPx - 2}px; --stage-color: ${color};`;
+  card.dataset.key = key;
+  card.onclick = () => toggleSelection(key);
+
+  let stageTag = '';
+  if (!isAllView) {
+    stageTag = `<div class="dj-stage-tag" style="--stage-color:${color}">${STAGE_SHORT[set.stage]}</div>`;
+  }
+
+  card.innerHTML = `
+    <div class="dj-card-inner">
+      <div class="dj-avatar ${avatarSize}" style="background: linear-gradient(135deg, ${color}, ${color}88);" data-artist="${set.artist}">
+        ${getInitials(set.artist)}
+      </div>
+      <div class="dj-info">
+        <div class="dj-name">${set.artist}</div>
+        <div class="dj-time">${set.start} - ${set.end}</div>
+        ${stageTag}
+      </div>
+    </div>
+    <div class="conflict-badge">!</div>
+  `;
+
+  // Try loading artist image
+  const avatar = card.querySelector('.dj-avatar');
+  tryLoadArtistImage(avatar, set.artist);
+
+  return card;
+}
+
+function renderHourMarkers(container, showLabels) {
+  const markers = document.createElement('div');
+  markers.className = 'hour-markers';
+
+  for (let i = 0; i <= currentTimelineHours(); i++) {
+    const hour = (currentTimelineStart() + i) % 24;
+    const label = `${hour.toString().padStart(2, '0')}:00`;
+    const topPx = minutesToPx(i * 60);
+
+    const line = document.createElement('div');
+    line.className = 'hour-line';
+    line.style.top = `${topPx}px`;
+    line.setAttribute('data-label', label);
+    markers.appendChild(line);
+
+    if (showLabels) {
+      const lbl = document.createElement('div');
+      lbl.className = 'hour-label';
+      lbl.style.top = `${topPx}px`;
+      lbl.textContent = label;
+      markers.appendChild(lbl);
+    }
+  }
+
+  container.appendChild(markers);
+}
+
+function renderNowLine(container) {
+  const now = new Date();
+  const day = TIMETABLE.days[currentDay];
+  const festDate = new Date(day.date + 'T00:00:00');
+
+  // Check if now is during this day's festival hours (13:00 to next day 01:00)
+  const dayStart = new Date(festDate);
+  dayStart.setHours(13, 0, 0);
+  const dayEnd = new Date(festDate);
+  dayEnd.setDate(dayEnd.getDate() + 1);
+  dayEnd.setHours(1, 0, 0);
+
+  if (now >= dayStart && now <= dayEnd) {
+    let h = now.getHours();
+    let m = now.getMinutes();
+    if (h < BASE_START) h += 24;
+    const minutes = (h - BASE_START) * 60 + m - currentTimelineOffsetMin();
+    const topPx = minutesToPx(minutes);
+
+    const line = document.createElement('div');
+    line.className = 'now-line';
+    line.style.top = `${topPx}px`;
+    line.style.display = 'block';
+    container.appendChild(line);
+  }
+}
+
+function renderAllStages() {
+  const container = document.getElementById('timelineContainer');
+  const day = TIMETABLE.days[currentDay];
+
+  const view = document.createElement('div');
+  view.className = 'all-stages-view';
+
+  TIMETABLE.stages.forEach(stage => {
+    const color = STAGE_COLORS[stage];
+    const col = document.createElement('div');
+    col.className = 'stage-column';
+    col.style.setProperty('--col-color', color);
+
+    col.innerHTML = `<div class="stage-column-header">${STAGE_SHORT[stage]}</div>`;
+
+    const body = document.createElement('div');
+    body.className = 'stage-column-body';
+
+    renderHourMarkers(body, false);
+
+    const stageSets = day.sets.filter(s => s.stage === stage);
+    stageSets.forEach(set => {
+      body.appendChild(createDjCard(set, currentDay, true));
+    });
+
+    renderNowLine(body);
+    col.appendChild(body);
+    view.appendChild(col);
+  });
+
+  container.innerHTML = '';
+
+  // Add a shared time sidebar
+  const wrapper = document.createElement('div');
+  wrapper.style.cssText = 'display: flex; position: relative;';
+
+  const sidebar = document.createElement('div');
+  sidebar.style.cssText = 'flex-shrink: 0; width: 42px; position: relative;';
+  const totalHeight = minutesToPxHeight(currentTimelineHours() * 60);
+  sidebar.style.minHeight = totalHeight + 'px';
+  sidebar.style.marginTop = '30px'; // align with column body below header
+
+  for (let i = 0; i <= currentTimelineHours(); i++) {
+    const hour = (currentTimelineStart() + i) % 24;
+    const label = `${hour.toString().padStart(2, '0')}:00`;
+    const topPx = minutesToPx(i * 60);
+    const lbl = document.createElement('div');
+    lbl.style.cssText = `position: absolute; top: ${topPx}px; right: 4px; transform: translateY(-50%); font-size: 10px; color: rgba(255,255,255,0.35); white-space: nowrap;`;
+    lbl.textContent = label;
+    sidebar.appendChild(lbl);
+  }
+
+  wrapper.appendChild(sidebar);
+  wrapper.appendChild(view);
+  container.appendChild(wrapper);
+}
+
+function renderSingleStage() {
+  const container = document.getElementById('timelineContainer');
+  const day = TIMETABLE.days[currentDay];
+  const color = STAGE_COLORS[currentStage];
+
+  container.innerHTML = '';
+
+  const view = document.createElement('div');
+  view.className = 'single-stage-view';
+
+  const body = document.createElement('div');
+  body.className = 'single-stage-body';
+
+  // Time sidebar
+  const sidebar = document.createElement('div');
+  sidebar.className = 'time-sidebar';
+  for (let i = 0; i <= currentTimelineHours(); i++) {
+    const hour = (currentTimelineStart() + i) % 24;
+    const label = `${hour.toString().padStart(2, '0')}:00`;
+    const topPx = minutesToPx(i * 60);
+    const lbl = document.createElement('div');
+    lbl.className = 'hour-label';
+    lbl.style.top = `${topPx}px`;
+    lbl.textContent = label;
+    sidebar.appendChild(lbl);
+  }
+  body.appendChild(sidebar);
+
+  // Cards area
+  const cardsArea = document.createElement('div');
+  cardsArea.className = 'set-cards-area';
+  cardsArea.style.position = 'relative';
+  const totalHeight = minutesToPxHeight(currentTimelineHours() * 60);
+  cardsArea.style.minHeight = totalHeight + 'px';
+
+  renderHourMarkers(cardsArea, false);
+
+  const stageSets = day.sets.filter(s => s.stage === currentStage);
+  stageSets.forEach(set => {
+    cardsArea.appendChild(createDjCard(set, currentDay, false));
+  });
+
+  renderNowLine(cardsArea);
+  body.appendChild(cardsArea);
+  body.style.minHeight = totalHeight + 'px';
+  view.appendChild(body);
+  container.appendChild(view);
+}
+
+function render() {
+  renderDayTabs();
+  renderStageTabs();
+
+  if (currentStage === 'ALL') {
+    renderAllStages();
+  } else {
+    renderSingleStage();
+  }
+
+  updateSelectionCount();
+}
+
+// ===== INTERACTIONS =====
+function selectDay(idx) {
+  currentDay = idx;
+  render();
+}
+
+function selectStage(stage) {
+  currentStage = stage;
+  render();
+  // Scroll stage tab into view
+  const activeTab = document.querySelector('.stage-tab.active');
+  if (activeTab) activeTab.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+  // Show/hide swipe hint on mobile
+  const hint = document.getElementById('swipeHint');
+  if (window.innerWidth < 768 && stage !== 'ALL') {
+    hint.classList.add('show');
+  } else {
+    hint.classList.remove('show');
+  }
+}
+
+function toggleSelection(key) {
+  if (selections.has(key)) {
+    selections.delete(key);
+  } else {
+    selections.add(key);
+  }
+  saveSelections();
+  render();
+}
+
+function updateSelectionCount() {
+  const count = selections.size;
+  const countEl = document.getElementById('selCount');
+  countEl.textContent = count;
+
+  const picksBtn = document.getElementById('picksBtn');
+  const shareBtn = document.getElementById('shareBtn');
+  if (count === 0) {
+    picksBtn.classList.add('hidden');
+    shareBtn.classList.add('hidden');
+  } else {
+    picksBtn.classList.remove('hidden');
+    shareBtn.classList.remove('hidden');
+  }
+}
+
+// ===== MY PICKS MODAL =====
+function openPicks() {
+  const modal = document.getElementById('picksModal');
+  const body = document.getElementById('picksBody');
+  modal.classList.add('open');
+
+  if (selections.size === 0) {
+    body.innerHTML = '<div class="no-picks">No picks yet. Tap on DJ cards to select your favorites!</div>';
+    return;
+  }
+
+  let html = '';
+
+  TIMETABLE.days.forEach((day, dayIdx) => {
+    const selected = day.sets.filter(s => selections.has(getSetKey(dayIdx, s.artist, s.stage)));
+    if (selected.length === 0) return;
+
+    // Sort by start time
+    selected.sort((a, b) => timeToMinutes(a.start) - timeToMinutes(b.start));
+
+    const conflicts = findConflicts(dayIdx);
+    const date = new Date(day.date + 'T00:00:00');
+    const dateStr = `${date.getMonth() + 1}/${date.getDate()}`;
+
+    html += `<div class="picks-day-group">
+      <div class="picks-day-label">${day.day} ${dateStr}</div>`;
+
+    selected.forEach(set => {
+      const color = STAGE_COLORS[set.stage];
+      const key = getSetKey(dayIdx, set.artist, set.stage);
+      const isConflict = conflicts.has(key);
+
+      html += `<div class="picks-item" style="--stage-color: ${color}">
+        <div class="dj-avatar" data-artist="${set.artist}" style="background: linear-gradient(135deg, ${color}, ${color}88);">
+          ${getInitials(set.artist)}
+        </div>
+        <div class="picks-info">
+          <div class="picks-name">${set.artist}</div>
+          <div class="picks-meta">${set.start} - ${set.end}</div>
+          <div class="picks-stage" style="--stage-color: ${color}">${STAGE_SHORT[set.stage]}</div>
+        </div>
+        ${isConflict ? '<div class="picks-conflict">! Conflict</div>' : ''}
+      </div>`;
+    });
+
+    html += '</div>';
+  });
+
+  body.innerHTML = html;
+
+  // Load images for picks modal avatars
+  body.querySelectorAll('.picks-item .dj-avatar').forEach(avatar => {
+    const artist = avatar.dataset.artist;
+    if (artist) tryLoadArtistImage(avatar, artist);
+  });
+}
+
+function closePicks() {
+  document.getElementById('picksModal').classList.remove('open');
+}
+
+// ===== SAVE AS IMAGE =====
+async function saveAsImage() {
+  const btn = document.getElementById('saveBtn');
+  btn.classList.add('saving');
+  btn.innerHTML = '<span>&#9203;</span> Saving...';
+
+  const day = TIMETABLE.days[currentDay];
+
+  try {
+    // Images are already data URLs (loaded via XHR blob), so canvas won't be tainted
+    const fab = document.querySelector('.floating-actions');
+    const swipeHint = document.getElementById('swipeHint');
+    fab.style.display = 'none';
+    if (swipeHint) swipeHint.style.display = 'none';
+
+    // Capture with html2canvas
+    const canvas = await html2canvas(document.body, {
+      backgroundColor: '#06060f',
+      scale: 2,
+      logging: false,
+      width: document.body.scrollWidth,
+      height: document.body.scrollHeight,
+      windowWidth: document.body.scrollWidth,
+      windowHeight: document.body.scrollHeight,
+      onclone: (clonedDoc) => {
+        // Hide header, search bar
+        const header = clonedDoc.querySelector('.festival-header');
+        if (header) header.style.display = 'none';
+        const search = clonedDoc.querySelector('.search-container');
+        if (search) search.style.display = 'none';
+        // Make sticky controls non-sticky so they render in flow
+        const controls = clonedDoc.querySelector('.sticky-controls');
+        if (controls) controls.style.position = 'relative';
+
+        clonedDoc.querySelectorAll('.dj-card').forEach(card => {
+          card.style.backdropFilter = 'none';
+          card.style.webkitBackdropFilter = 'none';
+          card.style.background = card.classList.contains('selected')
+            ? 'rgba(212,168,67,0.2)'
+            : card.classList.contains('conflict')
+            ? 'rgba(255,45,85,0.2)'
+            : 'rgba(30,30,60,0.85)';
+        });
+        const cf = clonedDoc.querySelector('.floating-actions');
+        if (cf) cf.style.display = 'none';
+        const sh = clonedDoc.querySelector('.swipe-hint');
+        if (sh) sh.style.display = 'none';
+        const fb = clonedDoc.querySelector('.friend-banner');
+        if (fb) fb.style.display = 'none';
+        clonedDoc.body.style.background = '#06060f';
+        // Remove bottom padding for tight capture
+        const tc = clonedDoc.querySelector('.timeline-container');
+        if (tc) tc.style.paddingBottom = '8px';
+      }
+    });
+
+    fab.style.display = '';
+    if (swipeHint) swipeHint.style.display = '';
+
+    // Download
+    const link = document.createElement('a');
+    const stageName = currentStage === 'ALL' ? 'All_Stages' : currentStage.replace(/\s+/g, '_');
+    link.download = `TML_Thailand_${day.day}_${stageName}.png`;
+    link.href = canvas.toDataURL('image/png');
+    link.click();
+
+    showToast('Image saved!');
+  } catch (err) {
+    console.error('Save failed:', err);
+    showToast('Save failed - try again');
+    document.querySelector('.floating-actions').style.display = '';
+  }
+
+  btn.classList.remove('saving');
+  btn.innerHTML = '<span>&#128247;</span> Save Image';
+}
+
+// ===== SHARE =====
+function sharePicks() {
+  if (selections.size === 0) return;
+  const encoded = encodeSelections(selections);
+  const url = window.location.origin + window.location.pathname + '#' + encoded;
+
+  if (navigator.clipboard) {
+    navigator.clipboard.writeText(url).then(() => showToast('Link copied! Share it with friends'));
+  } else {
+    // Fallback
+    const ta = document.createElement('textarea');
+    ta.value = url;
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand('copy');
+    document.body.removeChild(ta);
+    showToast('Link copied! Share it with friends');
+  }
+}
+
+// ===== SEARCH =====
+document.getElementById('searchInput').addEventListener('input', (e) => {
+  searchQuery = e.target.value.trim();
+  render();
+
+  // Auto-scroll to first match if searching
+  if (searchQuery) {
+    const match = document.querySelector('.dj-card.search-match');
+    if (match) {
+      match.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+  }
+});
+
+// ===== TOAST =====
+function showToast(msg) {
+  const toast = document.getElementById('toast');
+  toast.textContent = msg;
+  toast.classList.add('show');
+  setTimeout(() => toast.classList.remove('show'), 2500);
+}
+
+// ===== MODAL CLOSE ON BACKDROP =====
+document.getElementById('picksModal').addEventListener('click', (e) => {
+  if (e.target === e.currentTarget) closePicks();
+});
+
+// ===== INIT =====
+// On mobile, default to Mainstage instead of ALL (too cramped)
+if (window.innerWidth < 768) {
+  currentStage = 'Mainstage';
+}
+loadSelections();
+loadFriendSelections();
+render();
+// Show swipe hint on mobile
+if (window.innerWidth < 768 && currentStage !== 'ALL') {
+  document.getElementById('swipeHint').classList.add('show');
+}
+
+// ===== SWIPE GESTURE (mobile) =====
+let touchStartX = 0;
+let touchStartY = 0;
+const timelineEl = document.getElementById('timelineContainer');
+
+timelineEl.addEventListener('touchstart', (e) => {
+  touchStartX = e.changedTouches[0].screenX;
+  touchStartY = e.changedTouches[0].screenY;
+}, { passive: true });
+
+timelineEl.addEventListener('touchend', (e) => {
+  const dx = e.changedTouches[0].screenX - touchStartX;
+  const dy = e.changedTouches[0].screenY - touchStartY;
+
+  // Only trigger if horizontal swipe > 80px and more horizontal than vertical
+  if (Math.abs(dx) > 80 && Math.abs(dx) > Math.abs(dy) * 1.5) {
+    if (currentStage === 'ALL') return; // Don't swipe in ALL view
+
+    const stages = TIMETABLE.stages;
+    const idx = stages.indexOf(currentStage);
+    if (dx < 0 && idx < stages.length - 1) {
+      // Swipe left → next stage
+      selectStage(stages[idx + 1]);
+    } else if (dx > 0 && idx > 0) {
+      // Swipe right → prev stage
+      selectStage(stages[idx - 1]);
+    }
+  }
+}, { passive: true });
+
+// Update now-line every minute
+setInterval(() => {
+  const nowLines = document.querySelectorAll('.now-line');
+  // Just re-render to update position
+  if (nowLines.length > 0) render();
+}, 60000);
+</script>
+</body>
+</html>
