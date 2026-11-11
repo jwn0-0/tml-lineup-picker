@@ -787,6 +787,48 @@ body::before {
 }
 
 /* ===== TOAST ===== */
+/* Image preview modal */
+.image-preview-overlay {
+  display: none;
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  z-index: 9999;
+  background: rgba(0,0,0,0.92);
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+}
+
+.image-preview-overlay.open { display: flex; }
+
+.image-preview-hint {
+  color: var(--gold);
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: 12px;
+  text-align: center;
+}
+
+.image-preview-img {
+  max-width: 100%;
+  max-height: 75vh;
+  border-radius: 8px;
+  box-shadow: 0 4px 30px rgba(0,0,0,0.5);
+}
+
+.image-preview-close {
+  margin-top: 16px;
+  padding: 10px 24px;
+  background: rgba(255,255,255,0.1);
+  border: 1px solid rgba(255,255,255,0.2);
+  border-radius: 20px;
+  color: white;
+  font-size: 14px;
+  cursor: pointer;
+  font-family: 'Montserrat', sans-serif;
+}
+
 .toast {
   position: fixed;
   bottom: 80px;
@@ -1112,6 +1154,13 @@ body::before {
 
 <!-- Timeline -->
 <div class="timeline-container" id="timelineContainer"></div>
+
+<!-- Image Preview Modal -->
+<div class="image-preview-overlay" id="imagePreview" onclick="closeImagePreview(event)">
+  <div class="image-preview-hint">Long press image to save to photos</div>
+  <img class="image-preview-img" id="previewImg" src="" alt="Timetable">
+  <button class="image-preview-close" onclick="closeImagePreview()">Close</button>
+</div>
 
 <!-- Floating Actions -->
 <div class="floating-actions">
@@ -1545,6 +1594,14 @@ function getSetKey(dayIdx, artist, stage) {
   return `${dayIdx}|${artist}|${stage}`;
 }
 
+function formatArtistName(name) {
+  if (name.includes(' B2B ')) {
+    const parts = name.split(' B2B ');
+    return parts[0] + '<br><span style="font-size:0.8em;opacity:0.7">B2B</span> ' + parts[1];
+  }
+  return name;
+}
+
 function getInitials(name) {
   // Handle B2B names
   const clean = name.replace(/B2B/g, '&');
@@ -1685,7 +1742,7 @@ function createDjCard(set, dayIdx, isAllView) {
         ${getInitials(set.artist)}
       </div>
       <div class="dj-info">
-        <div class="dj-name">${set.artist}</div>
+        <div class="dj-name">${formatArtistName(set.artist)}</div>
         <div class="dj-time">${set.start} - ${set.end}</div>
         ${stageTag}
       </div>
@@ -1771,6 +1828,8 @@ function renderAllStages() {
 
     const body = document.createElement('div');
     body.className = 'stage-column-body';
+    const totalHeight = minutesToPxHeight(currentTimelineHours() * 60);
+    body.style.minHeight = totalHeight + 'px';
 
     renderHourMarkers(body, false);
 
@@ -1898,6 +1957,7 @@ function renderMobileAllStages() {
 
       const item = document.createElement('div');
       item.className = `mobile-set-item ${isSelected ? 'selected' : ''} ${isConflict ? 'conflict' : ''} ${isFriend ? 'friend-selected' : ''}`;
+      item.dataset.key = key;
       item.onclick = () => { toggleSelection(key); };
 
       item.innerHTML = `
@@ -1966,7 +2026,27 @@ function toggleSelection(key) {
     selections.add(key);
   }
   saveSelections();
-  render();
+
+  // Update only affected cards instead of full re-render
+  const conflicts = findConflicts(currentDay);
+  document.querySelectorAll('.dj-card').forEach(card => {
+    const k = card.dataset.key;
+    if (!k) return;
+    const isSel = selections.has(k);
+    const isConf = conflicts.has(k) && isSel;
+    card.classList.toggle('selected', isSel);
+    card.classList.toggle('conflict', isConf);
+  });
+  // Also update mobile list items
+  document.querySelectorAll('.mobile-set-item').forEach(item => {
+    const k = item.dataset.key;
+    if (!k) return;
+    const isSel = selections.has(k);
+    const isConf = conflicts.has(k) && isSel;
+    item.classList.toggle('selected', isSel);
+    item.classList.toggle('conflict', isConf);
+  });
+  updateSelectionCount();
 }
 
 function updateSelectionCount() {
@@ -2052,28 +2132,29 @@ async function saveAsImage() {
   btn.classList.add('saving');
   btn.innerHTML = '<span>&#9203;</span> Saving...';
 
-  const day = TIMETABLE.days[currentDay];
-
   try {
-    const fab = document.querySelector('.floating-actions');
-    const swipeHint = document.getElementById('swipeHint');
-    const header = document.querySelector('.festival-header');
-    const search = document.querySelector('.search-container');
-    const controls = document.querySelector('.sticky-controls');
-    const timeline = document.getElementById('timelineContainer');
+    // Scroll to top-left to capture full content
+    window.scrollTo(0, 0);
+    const wrapper = document.querySelector('.timeline-scroll-wrapper');
+    if (wrapper) wrapper.scrollLeft = 0;
+
+    await new Promise(r => setTimeout(r, 200));
+
+    // Capture full scrollable area
+    const fullW = document.body.scrollWidth;
+    const fullH = document.body.scrollHeight;
 
     const canvas = await html2canvas(document.body, {
       backgroundColor: '#06060f',
       scale: 2,
       logging: false,
-      width: document.documentElement.clientWidth,
-      height: document.body.scrollHeight,
-      windowWidth: document.documentElement.clientWidth,
-      windowHeight: document.body.scrollHeight,
+      width: fullW,
+      height: fullH,
+      windowWidth: fullW,
+      windowHeight: fullH,
       scrollX: 0,
       scrollY: 0,
       onclone: (clonedDoc) => {
-        // Hide header, search, FABs, swipe hint
         const h = clonedDoc.querySelector('.festival-header');
         if (h) h.style.display = 'none';
         const s = clonedDoc.querySelector('.search-container');
@@ -2084,13 +2165,15 @@ async function saveAsImage() {
         if (sw) sw.style.display = 'none';
         const fb = clonedDoc.querySelector('.friend-banner');
         if (fb) fb.style.display = 'none';
-        // Unstick controls
+        const ip = clonedDoc.querySelector('.image-preview-overlay');
+        if (ip) ip.style.display = 'none';
         const ctrl = clonedDoc.querySelector('.sticky-controls');
         if (ctrl) ctrl.style.position = 'relative';
-        // Tight bottom
         const tc = clonedDoc.querySelector('.timeline-container');
         if (tc) tc.style.paddingBottom = '4px';
-        // Fix backdrop-filter
+        // Make wrapper show full content (no scroll clip)
+        const tw = clonedDoc.querySelector('.timeline-scroll-wrapper');
+        if (tw) { tw.style.overflow = 'visible'; tw.style.width = 'auto'; }
         clonedDoc.querySelectorAll('.dj-card').forEach(card => {
           card.style.backdropFilter = 'none';
           card.style.webkitBackdropFilter = 'none';
@@ -2102,49 +2185,41 @@ async function saveAsImage() {
         });
         clonedDoc.body.style.background = '#06060f';
         clonedDoc.body.style.overflow = 'visible';
+        clonedDoc.body.style.width = fullW + 'px';
       }
     });
 
-    // Download - use blob for iOS/mobile compatibility
-    const stageName = currentStage === 'ALL' ? 'All_Stages' : currentStage.replace(/\s+/g, '_');
-    const fileName = `TML_Thailand_${day.day}_${stageName}.png`;
+    // Show image in preview modal (long-press to save on mobile)
+    const dataUrl = canvas.toDataURL('image/png');
+    const previewImg = document.getElementById('previewImg');
+    previewImg.src = dataUrl;
+    document.getElementById('imagePreview').classList.add('open');
 
-    canvas.toBlob(blob => {
-      if (!blob) { showToast('Save failed'); return; }
-
-      // Try native share on mobile (iOS/Android)
-      if (navigator.share && navigator.canShare) {
-        const file = new File([blob], fileName, { type: 'image/png' });
-        if (navigator.canShare({ files: [file] })) {
-          navigator.share({ files: [file], title: 'My TML Picks' })
-            .then(() => showToast('Shared!'))
-            .catch(() => fallbackDownload(blob, fileName));
-          return;
-        }
-      }
-      fallbackDownload(blob, fileName);
-    }, 'image/png');
-
-    function fallbackDownload(blob, name) {
-      const url = URL.createObjectURL(blob);
+    // Also try download for desktop
+    if (!/iPhone|iPad|Android/i.test(navigator.userAgent)) {
+      const day = TIMETABLE.days[currentDay];
+      const stageName = currentStage === 'ALL' ? 'All_Stages' : currentStage.replace(/\s+/g, '_');
       const link = document.createElement('a');
-      link.href = url;
-      link.download = name;
+      link.download = `TML_Thailand_${day.day}_${stageName}.png`;
+      link.href = dataUrl;
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
-      setTimeout(() => URL.revokeObjectURL(url), 1000);
-      showToast('Image saved!');
     }
 
   } catch (err) {
     console.error('Save failed:', err);
     showToast('Save failed - try again');
-    document.querySelector('.floating-actions').style.display = '';
   }
 
   btn.classList.remove('saving');
   btn.innerHTML = '<span>&#128247;</span> Save Image';
+}
+
+function closeImagePreview(e) {
+  if (e && e.target && e.target.tagName === 'IMG') return; // Don't close when tapping image
+  document.getElementById('imagePreview').classList.remove('open');
+  document.getElementById('previewImg').src = '';
 }
 
 // ===== SHARE =====
