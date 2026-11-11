@@ -2163,6 +2163,8 @@ async function saveAsImage() {
     });
     document.body.style.width = requiredW + 'px';
     document.body.style.overflow = 'visible';
+    // Increase hour-height for taller cards so names don't get cut
+    document.documentElement.style.setProperty('--hour-height', '150px');
 
     await new Promise(r => setTimeout(r, 200));
 
@@ -2223,6 +2225,7 @@ async function saveAsImage() {
     });
     document.body.style.width = '';
     document.body.style.overflow = '';
+    document.documentElement.style.removeProperty('--hour-height');
 
     // Show image in preview modal (long-press to save on mobile)
     const dataUrl = canvas.toDataURL('image/png');
