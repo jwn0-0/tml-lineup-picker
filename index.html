@@ -37,7 +37,7 @@
   --friend-color: #00e5ff;
   --selected-glow: rgba(212,168,67,0.4);
   --friend-glow: rgba(0,229,255,0.4);
-  --hour-height: 120px;
+  --hour-height: 160px;
   --stage-mainstage: #FFD700;
   --stage-freedom: #FF6B35;
   --stage-core: #00D4AA;
@@ -484,10 +484,10 @@ body::before {
 
 /* Dim unselected cards when user has any picks */
 body.has-selections .dj-card:not(.selected):not(.friend-selected) {
-  opacity: 0.4;
+  opacity: 0.55;
 }
 body.has-selections .dj-card:not(.selected):not(.friend-selected):hover {
-  opacity: 0.7;
+  opacity: 0.8;
 }
 body.has-selections .dj-card.selected {
   opacity: 1;
@@ -903,7 +903,7 @@ body.has-selections .dj-card.selected {
 .wp-preview-frame {
   width: 100%;
   max-width: 360px;
-  aspect-ratio: 1080 / 2340;
+  aspect-ratio: 9 / 16;
   border-radius: 10px;
   overflow: hidden;
   background: #06060f;
@@ -1165,7 +1165,7 @@ body.has-selections .dj-card.selected {
 
 /* Mobile first (default is mobile) */
 @media (max-width: 767px) {
-  :root { --hour-height: 60px; }
+  :root { --hour-height: 120px; }
 
   .festival-header { padding: 12px 12px 6px; }
   .festival-logo { font-size: 15px; letter-spacing: 2px; }
@@ -1217,7 +1217,7 @@ body.has-selections .dj-card.selected {
 
 /* Very small phones */
 @media (max-width: 380px) {
-  :root { --hour-height: 55px; }
+  :root { --hour-height: 100px; }
   .festival-logo { font-size: 13px; }
   .stage-column { min-width: 95px; flex-shrink: 0; }
   .stage-tab { padding: 3px 8px; font-size: 9px; }
@@ -1288,7 +1288,7 @@ body.has-selections .dj-card.selected {
     </div>
     <div class="wp-hint">
       📱 Instagram Story → tap "Save Image" to download.<br>
-      Image size: 1080 × 2340 (9:19.5)
+      Image size: 1080 × 1920 (9:16)
     </div>
   </div>
 </div>
@@ -1345,6 +1345,7 @@ const DJ_FILE_MAP = {
   "Row1": { file: "ROW1", ext: "webp" },
   "Sabai": { file: "SABAI", ext: "webp" },
   "Alan Walker": { file: "AlanWalker", ext: "jpg" },
+  "Aly & Fila": { file: "Aly&Fila", ext: "jpg" },
   "Anika": { file: "Anika", ext: "jpg" },
   "CamelPhat": { file: "CamelPhat", ext: "jpg" },
   "Claudine": { file: "Claudine", ext: "jpg" },
@@ -1370,7 +1371,12 @@ const DJ_FILE_MAP = {
   "Vicky Kroon": { file: "VickyKroon", ext: "jpg" },
   "X Club.": { file: "XClub.", ext: "jpg" },
   "Yellow Claw": { file: "YelloClaw", ext: "jpg" },
-  "Youna": { file: "Youna", ext: "jpg" }
+  "Youna": { file: "Youna", ext: "jpg" },
+  "Rebeca Ark": { file: "RebecaArk", ext: "jpg" },
+  "XY": { file: "XY", ext: "jpg" },
+  "Petra": { file: "Petra", ext: "jpg" },
+  "Blastoyz B2B Whitenoise": { file: "blastoyz_whiteno1se", ext: "jpg" },
+  "Mad Maxx B2B Stryker": { file: "madmaxx_stryker", ext: "jpg" }
 };
 
 // Known files in DJ/ folder — only attempt image load for these
@@ -2304,7 +2310,7 @@ async function renderWallpaper() {
   await new Promise(r => setTimeout(r, 30));
 
   try {
-    const W = 1080, H = 2340;
+    const W = 1080, H = 1920;
     const day = TIMETABLE.days[wpDay];
     const stages = TIMETABLE.stages;
     const sets = day.sets;
@@ -2476,7 +2482,7 @@ async function renderWallpaper() {
 
           ctx.save();
           // Apply grayscale for dimmed cards
-          if (isDimmed) ctx.globalAlpha = 0.35;
+          if (isDimmed) ctx.globalAlpha = 0.55;
           roundRect(ctx, imgX, imgY, imgW, drawH, 4);
           ctx.clip();
           const src = imageCache[set.artist];
@@ -2498,7 +2504,7 @@ async function renderWallpaper() {
             ctx.save();
             roundRect(ctx, imgX, imgY, imgW, drawH, 4);
             ctx.clip();
-            ctx.fillStyle = 'rgba(6,6,15,0.55)';
+            ctx.fillStyle = 'rgba(6,6,15,0.35)';
             ctx.fillRect(imgX, imgY, imgW, drawH);
             ctx.restore();
           }
@@ -2507,7 +2513,7 @@ async function renderWallpaper() {
         }
 
         // Artist name
-        ctx.fillStyle = isSelected ? '#f0d078' : (isFriend ? '#00e5ff' : (isDimmed ? 'rgba(255,255,255,0.35)' : '#f0f0f0'));
+        ctx.fillStyle = isSelected ? '#f0d078' : (isFriend ? '#00e5ff' : (isDimmed ? 'rgba(255,255,255,0.5)' : '#f0f0f0'));
         ctx.font = '700 ' + nameFontSize + 'px Montserrat, sans-serif';
         ctx.textAlign = 'center';
         const centerX = cx + cw / 2;
@@ -2526,7 +2532,7 @@ async function renderWallpaper() {
         // Time
         const timeY = cursorY + nameFontSize + nameLines.length * nameLineH + 2;
         if (timeY + timeFontSize < cy + ch) {
-          ctx.fillStyle = isDimmed ? 'rgba(255,255,255,0.2)' : 'rgba(255,255,255,0.45)';
+          ctx.fillStyle = isDimmed ? 'rgba(255,255,255,0.35)' : 'rgba(255,255,255,0.45)';
           ctx.font = '500 ' + timeFontSize + 'px Montserrat, sans-serif';
           ctx.fillText(set.start + '-' + set.end, centerX, timeY + timeFontSize);
         }
