@@ -58,6 +58,17 @@ body {
   -webkit-tap-highlight-color: transparent;
 }
 
+/* Phone-like layout on all screens */
+.app-shell {
+  max-width: 520px;
+  margin: 0 auto;
+  position: relative;
+  z-index: 1;
+  min-height: 100vh;
+  background: var(--bg-primary);
+  box-shadow: 0 0 80px rgba(0,0,0,0.6);
+}
+
 body::before {
   content: '';
   position: fixed;
@@ -375,8 +386,8 @@ body::before {
   transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
   display: flex;
   flex-direction: column;
-  justify-content: center;
-  padding: 8px 10px;
+  justify-content: flex-end;
+  padding: 4px;
   min-height: 44px;
 }
 
@@ -384,9 +395,9 @@ body::before {
   content: '';
   position: absolute;
   left: 0;
+  right: 0;
   top: 0;
-  bottom: 0;
-  width: 3px;
+  height: 2px;
   background: var(--stage-color);
 }
 
@@ -445,7 +456,7 @@ body::before {
 
 .dj-card.conflict::before {
   background: #ff2d55 !important;
-  width: 4px;
+  height: 3px;
 }
 
 @keyframes conflictPulse {
@@ -471,18 +482,31 @@ body::before {
   opacity: 0.2;
 }
 
+/* Dim unselected cards when user has any picks */
+body.has-selections .dj-card:not(.selected):not(.friend-selected) {
+  opacity: 0.4;
+}
+body.has-selections .dj-card:not(.selected):not(.friend-selected):hover {
+  opacity: 0.7;
+}
+body.has-selections .dj-card.selected {
+  opacity: 1;
+}
+
 .dj-card-inner {
   display: flex;
+  flex-direction: column;
   align-items: center;
-  gap: 8px;
+  gap: 2px;
   min-height: 0;
+  height: 100%;
 }
 
 .dj-avatar {
-  width: 48px;
-  height: 48px;
-  border-radius: 50%;
-  flex-shrink: 0;
+  width: 100%;
+  flex: 1;
+  min-height: 0;
+  border-radius: 6px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -491,7 +515,7 @@ body::before {
   color: #000;
   background: var(--stage-color);
   overflow: hidden;
-  border: 2px solid rgba(255,255,255,0.2);
+  border: none;
   box-shadow: 0 2px 8px rgba(0,0,0,0.3);
 }
 
@@ -499,44 +523,45 @@ body::before {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  border-radius: 50%;
+  border-radius: 6px;
 }
 
-.dj-avatar.small { width: 32px; height: 32px; font-size: 10px; }
+.dj-avatar.small { min-height: 0; font-size: 10px; }
 
 .dj-info {
-  flex: 1;
-  min-width: 0;
+  flex-shrink: 0;
+  width: 100%;
+  text-align: center;
   overflow: hidden;
 }
 
 .dj-name {
-  font-size: 12px;
-  font-weight: 600;
-  white-space: normal;
-  word-wrap: break-word;
-  overflow-wrap: break-word;
+  font-size: 11px;
+  font-weight: 700;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
   line-height: 1.3;
 }
 
 .dj-time {
-  font-size: 10px;
+  font-size: 9px;
   color: var(--text-secondary);
-  margin-top: 1px;
+  margin-top: 0;
 }
 
 .dj-stage-tag {
-  font-size: 8px;
+  font-size: 7px;
   font-weight: 600;
   color: var(--stage-color);
   text-transform: uppercase;
   letter-spacing: 0.5px;
-  margin-top: 1px;
+  margin-top: 0;
 }
 
-.dj-card.compact .dj-avatar { width: 28px; height: 28px; font-size: 9px; }
-.dj-card.compact .dj-name { font-size: 11px; }
-.dj-card.compact .dj-time { font-size: 9px; }
+.dj-card.compact .dj-avatar { display: none !important; }
+.dj-card.compact .dj-name { font-size: 10px; white-space: normal; }
+.dj-card.compact .dj-time { font-size: 8px; }
 
 .conflict-badge {
   position: absolute;
@@ -574,12 +599,12 @@ body::before {
 .floating-actions {
   position: fixed;
   bottom: 20px;
-  right: 16px;
   z-index: 200;
   display: flex;
   flex-direction: column;
   gap: 10px;
   align-items: flex-end;
+  right: max(16px, calc(50% - 244px));
 }
 
 .fab {
@@ -788,54 +813,149 @@ body::before {
 }
 
 /* ===== TOAST ===== */
-/* Image preview modal */
-.image-preview-overlay {
+/* ===== WALLPAPER MAKER MODAL ===== */
+.wp-overlay {
   display: none;
   position: fixed;
   top: 0; left: 0; right: 0; bottom: 0;
   z-index: 9999;
-  background: rgba(0,0,0,0.95);
+  background: rgba(0,0,0,0.85);
+  align-items: flex-end;
+  justify-content: center;
+}
+.wp-overlay.open { display: flex; }
+
+.wp-modal {
+  background: #111118;
+  width: 100%;
+  max-width: 540px;
+  max-height: 92vh;
+  border-radius: 20px 20px 0 0;
+  display: flex;
   flex-direction: column;
+  overflow: hidden;
+}
+
+.wp-header {
+  display: flex;
   align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px 8px;
+  flex-shrink: 0;
+}
+.wp-header-title {
+  font-family: 'Cinzel', serif;
+  font-weight: 700;
+  font-size: 16px;
+  color: var(--text-primary);
+}
+.wp-close {
+  background: none;
+  border: none;
+  color: var(--text-secondary);
+  font-size: 24px;
+  cursor: pointer;
+  padding: 4px 8px;
+  line-height: 1;
+}
+
+.wp-controls {
+  padding: 8px 16px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.wp-day-tabs {
+  display: flex;
+  gap: 6px;
+}
+.wp-day-tab {
+  flex: 1;
+  padding: 8px 4px;
+  border-radius: 10px;
+  border: 1.5px solid rgba(255,255,255,0.15);
+  background: transparent;
+  color: var(--text-secondary);
+  font-family: 'Montserrat', sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  text-align: center;
+  transition: all 0.2s;
+}
+.wp-day-tab.active {
+  background: var(--gold);
+  color: #000;
+  border-color: var(--gold);
+}
+
+.wp-preview-area {
+  flex: 1;
   overflow: auto;
   -webkit-overflow-scrolling: touch;
-  padding: 60px 8px 80px;
+  padding: 0 16px 12px;
+  display: flex;
+  justify-content: center;
 }
 
-.image-preview-overlay.open { display: flex; }
+.wp-preview-frame {
+  width: 100%;
+  max-width: 360px;
+  aspect-ratio: 1080 / 2340;
+  border-radius: 10px;
+  overflow: hidden;
+  background: #06060f;
+  position: relative;
+  flex-shrink: 0;
+}
+.wp-preview-frame img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: block;
+}
 
-.image-preview-hint {
-  color: var(--gold);
-  font-size: 14px;
-  font-weight: 600;
-  margin-bottom: 12px;
+.wp-actions {
+  padding: 12px 16px 20px;
+  display: flex;
+  gap: 10px;
+  flex-shrink: 0;
+}
+.wp-save-btn {
+  flex: 1;
+  padding: 14px;
+  border-radius: 12px;
+  border: none;
+  background: linear-gradient(135deg, var(--gold-dark), var(--gold));
+  color: #000;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+.wp-save-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+.wp-save-btn:hover:not(:disabled) {
+  box-shadow: 0 4px 20px rgba(212,168,67,0.4);
+}
+
+.wp-hint {
+  padding: 0 16px 12px;
+  font-size: 11px;
+  color: var(--text-muted);
+  line-height: 1.5;
   text-align: center;
   flex-shrink: 0;
-  position: sticky;
-  top: 0;
-  background: rgba(0,0,0,0.9);
-  padding: 8px 16px;
-  border-radius: 20px;
-  z-index: 1;
 }
 
-.image-preview-img {
-  width: 100%;
-  border-radius: 8px;
-  box-shadow: 0 4px 30px rgba(0,0,0,0.5);
-  flex-shrink: 0;
-}
-
-.image-preview-close {
-  margin-top: 16px;
-  padding: 10px 24px;
-  background: rgba(255,255,255,0.1);
-  border: 1px solid rgba(255,255,255,0.2);
-  border-radius: 20px;
-  color: white;
-  font-size: 14px;
-  cursor: pointer;
-  font-family: 'Montserrat', sans-serif;
+@media (min-width: 768px) {
+  .wp-overlay { align-items: center; }
+  .wp-modal { border-radius: 20px; max-height: 85vh; }
 }
 
 .toast {
@@ -1069,19 +1189,14 @@ body::before {
   .stage-column { min-width: 110px; flex-shrink: 0; }
   .stage-column-header { font-size: 8px; padding: 5px 2px; letter-spacing: 0.5px; }
 
-  .dj-card { left: 1px; right: 1px; padding: 4px 4px; border-radius: 6px; min-height: 32px; }
-  .dj-card-inner { gap: 4px; }
-  .dj-avatar { width: 32px; height: 32px; font-size: 9px; border-width: 1px; }
-  .dj-avatar.small { width: 26px; height: 26px; font-size: 8px; }
-  .dj-card.compact .dj-avatar { display: flex !important; }
+  .dj-card { left: 1px; right: 1px; padding: 3px; border-radius: 6px; min-height: 32px; }
+  .dj-card-inner { gap: 2px; }
+  .dj-avatar { font-size: 9px; }
   .dj-name { font-size: 9px; line-height: 1.2; }
   .dj-time { font-size: 7px; }
   .dj-stage-tag { font-size: 6px; }
   .dj-card.selected::after { width: 12px; height: 12px; top: 2px; right: 2px; background-size: 8px; }
-  .conflict-badge { width: 12px; height: 12px; font-size: 8px; top: 2px; right: 14px; }
-
-  .dj-card.selected::after { width: 14px; height: 14px; top: 4px; right: 4px; background-size: 10px; }
-  .conflict-badge { width: 16px; height: 16px; font-size: 10px; top: 3px; right: 20px; }
+  .conflict-badge { width: 14px; height: 14px; font-size: 9px; top: 2px; right: 16px; }
 
   .floating-actions { bottom: 12px; right: 10px; gap: 8px; }
   .fab { height: 38px; font-size: 12px; padding: 0 12px; border-radius: 19px; }
@@ -1109,29 +1224,16 @@ body::before {
   .day-tab { padding: 5px 6px; font-size: 10px; }
 }
 
-/* Tablet */
+/* Tablet & Desktop — keep phone layout, just center the shell */
 @media (min-width: 768px) {
-  .stage-column { min-width: 140px; }
-  .dj-card { left: 6px; right: 6px; padding: 8px 10px; }
-  .dj-name { font-size: 13px; }
-  .dj-avatar { width: 52px; height: 52px; }
-  .hour-label { font-size: 11px; }
-  .day-tab { font-size: 13px; padding: 10px 16px; }
-  .stage-tab { font-size: 12px; padding: 6px 14px; }
   .modal { border-radius: 20px; margin-bottom: 40px; max-height: 70vh; }
   .modal-overlay { align-items: center; }
-  :root { --hour-height: 100px; }
-}
-
-/* Desktop */
-@media (min-width: 1024px) {
-  .stage-column { min-width: 150px; }
-  .dj-avatar { width: 56px; height: 56px; }
-  :root { --hour-height: 90px; }
 }
 </style>
 </head>
 <body>
+
+<div class="app-shell">
 
 <!-- Header -->
 <div class="festival-header">
@@ -1164,16 +1266,36 @@ body::before {
 <!-- Timeline -->
 <div class="timeline-container" id="timelineContainer"></div>
 
-<!-- Image Preview Modal -->
-<div class="image-preview-overlay" id="imagePreview" onclick="closeImagePreview(event)">
-  <div class="image-preview-hint">Long press image to save to photos</div>
-  <img class="image-preview-img" id="previewImg" src="" alt="Timetable">
-  <button class="image-preview-close" onclick="closeImagePreview()">Close</button>
+</div><!-- /app-shell -->
+
+<!-- Wallpaper Maker Modal -->
+<div class="wp-overlay" id="wpOverlay" onclick="if(event.target===this)closeWallpaperMaker()">
+  <div class="wp-modal">
+    <div class="wp-header">
+      <span class="wp-header-title">Save Image</span>
+      <button class="wp-close" onclick="closeWallpaperMaker()">&times;</button>
+    </div>
+    <div class="wp-controls">
+      <div class="wp-day-tabs" id="wpDayTabs"></div>
+    </div>
+    <div class="wp-preview-area">
+      <div class="wp-preview-frame" id="wpPreviewFrame">
+        <img id="wpPreviewImg" src="" alt="Preview">
+      </div>
+    </div>
+    <div class="wp-actions">
+      <button class="wp-save-btn" id="wpSaveBtn" onclick="wpDownload()">Save Image</button>
+    </div>
+    <div class="wp-hint">
+      📱 Instagram Story → tap "Save Image" to download.<br>
+      Image size: 1080 × 2340 (9:19.5)
+    </div>
+  </div>
 </div>
 
 <!-- Floating Actions -->
 <div class="floating-actions">
-  <button class="fab fab-save" id="saveBtn" onclick="saveAsImage()">
+  <button class="fab fab-save" id="saveBtn" onclick="openWallpaperMaker()">
     <span>&#128247;</span> Save Image
   </button>
   <button class="fab fab-share" id="shareBtn" onclick="sharePicks()">
@@ -2060,6 +2182,7 @@ function toggleSelection(key) {
 
 function updateSelectionCount() {
   const count = selections.size;
+  document.body.classList.toggle('has-selections', count > 0);
   const countEl = document.getElementById('selCount');
   countEl.textContent = count;
 
@@ -2135,136 +2258,429 @@ function closePicks() {
   document.getElementById('picksModal').classList.remove('open');
 }
 
-// ===== SAVE AS IMAGE =====
-async function saveAsImage() {
-  const btn = document.getElementById('saveBtn');
-  btn.classList.add('saving');
-  btn.innerHTML = '<span>&#9203;</span> Saving...';
+// ===== WALLPAPER MAKER =====
+let wpDay = 0;
+let wpBlob = null;
+let wpRendering = false;
 
-  try {
-    // Scroll to top-left to capture full content
-    window.scrollTo(0, 0);
-    const scrollWrap = document.querySelector('.timeline-scroll-wrapper');
-    if (scrollWrap) scrollWrap.scrollLeft = 0;
-
-    await new Promise(r => setTimeout(r, 100));
-
-    // Calculate required width: 7 stages * 140px + sidebar 40px + padding
-    // Use fixed minimum that fits all 7 stages comfortably
-    const numStages = TIMETABLE.stages.length;
-    const minStageW = 140;
-    const sidebarW = 40;
-    const requiredW = numStages * minStageW + sidebarW + 20;
-
-    // Expand everything to full width
-    if (scrollWrap) {
-      scrollWrap.style.overflow = 'visible';
-      scrollWrap.style.width = requiredW + 'px';
-    }
-    const allStagesView = document.querySelector('.all-stages-view');
-    if (allStagesView) allStagesView.style.width = (numStages * minStageW) + 'px';
-    // Force each column to exact width
-    document.querySelectorAll('.stage-column').forEach(col => {
-      col.style.width = minStageW + 'px';
-      col.style.minWidth = minStageW + 'px';
-      col.style.flex = 'none';
-    });
-    document.body.style.width = requiredW + 'px';
-    document.body.style.overflow = 'visible';
-
-    await new Promise(r => setTimeout(r, 200));
-
-    const contentW = requiredW;
-    const contentH = document.body.scrollHeight;
-
-    const canvas = await html2canvas(document.body, {
-      backgroundColor: '#06060f',
-      scale: 2,
-      logging: false,
-      width: contentW,
-      height: contentH,
-      windowWidth: contentW,
-      windowHeight: contentH,
-      scrollX: 0,
-      scrollY: 0,
-      onclone: (clonedDoc) => {
-        const h = clonedDoc.querySelector('.festival-header');
-        if (h) h.style.display = 'none';
-        const s = clonedDoc.querySelector('.search-container');
-        if (s) s.style.display = 'none';
-        const f = clonedDoc.querySelector('.floating-actions');
-        if (f) f.style.display = 'none';
-        const sw = clonedDoc.querySelector('.swipe-hint');
-        if (sw) sw.style.display = 'none';
-        const fb = clonedDoc.querySelector('.friend-banner');
-        if (fb) fb.style.display = 'none';
-        const ip = clonedDoc.querySelector('.image-preview-overlay');
-        if (ip) ip.style.display = 'none';
-        const ctrl = clonedDoc.querySelector('.sticky-controls');
-        if (ctrl) ctrl.style.position = 'relative';
-        const tc = clonedDoc.querySelector('.timeline-container');
-        if (tc) tc.style.paddingBottom = '4px';
-        const tw = clonedDoc.querySelector('.timeline-scroll-wrapper');
-        if (tw) { tw.style.overflow = 'visible'; tw.style.width = contentW + 'px'; }
-        clonedDoc.querySelectorAll('.dj-card').forEach(card => {
-          card.style.backdropFilter = 'none';
-          card.style.webkitBackdropFilter = 'none';
-          card.style.background = card.classList.contains('selected')
-            ? 'rgba(212,168,67,0.2)'
-            : card.classList.contains('conflict')
-            ? 'rgba(255,45,85,0.2)'
-            : 'rgba(30,30,60,0.85)';
-        });
-        clonedDoc.body.style.background = '#06060f';
-        clonedDoc.body.style.overflow = 'visible';
-        clonedDoc.body.style.width = contentW + 'px';
-        // Taller cards in capture so names don't get cut
-        clonedDoc.documentElement.style.setProperty('--hour-height', '150px');
-      }
-    });
-
-    // Restore
-    if (scrollWrap) { scrollWrap.style.overflow = ''; scrollWrap.style.width = ''; }
-    if (allStagesView) allStagesView.style.width = '';
-    document.querySelectorAll('.stage-column').forEach(col => {
-      col.style.width = '';
-      col.style.minWidth = '';
-      col.style.flex = '';
-    });
-    document.body.style.width = '';
-    document.body.style.overflow = '';
-
-    // Show image in preview modal (long-press to save on mobile)
-    const dataUrl = canvas.toDataURL('image/png');
-    const previewImg = document.getElementById('previewImg');
-    previewImg.src = dataUrl;
-    document.getElementById('imagePreview').classList.add('open');
-
-    // Also try download for desktop
-    if (!/iPhone|iPad|Android/i.test(navigator.userAgent)) {
-      const day = TIMETABLE.days[currentDay];
-      const stageName = currentStage === 'ALL' ? 'All_Stages' : currentStage.replace(/\s+/g, '_');
-      const link = document.createElement('a');
-      link.download = `TML_Thailand_${day.day}_${stageName}.png`;
-      link.href = dataUrl;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-    }
-
-  } catch (err) {
-    console.error('Save failed:', err);
-    showToast('Save failed - try again');
-  }
-
-  btn.classList.remove('saving');
-  btn.innerHTML = '<span>&#128247;</span> Save Image';
+function openWallpaperMaker() {
+  wpDay = currentDay;
+  document.getElementById('wpOverlay').classList.add('open');
+  renderWpDayTabs();
+  renderWallpaper();
 }
 
-function closeImagePreview(e) {
-  if (e && e.target && e.target.tagName === 'IMG') return; // Don't close when tapping image
-  document.getElementById('imagePreview').classList.remove('open');
-  document.getElementById('previewImg').src = '';
+function closeWallpaperMaker() {
+  document.getElementById('wpOverlay').classList.remove('open');
+  document.getElementById('wpPreviewImg').src = '';
+  if (wpBlob) { wpBlob = null; }
+}
+
+function renderWpDayTabs() {
+  const container = document.getElementById('wpDayTabs');
+  container.innerHTML = TIMETABLE.days.map((day, i) => {
+    const date = new Date(day.date + 'T00:00:00');
+    const m = date.getMonth() + 1, d = date.getDate();
+    const dayNames = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+    const dayName = dayNames[date.getDay()];
+    return `<button class="wp-day-tab ${i === wpDay ? 'active' : ''}" onclick="wpSelectDay(${i})">${m}/${d} ${dayName}</button>`;
+  }).join('');
+}
+
+function wpSelectDay(idx) {
+  wpDay = idx;
+  renderWpDayTabs();
+  renderWallpaper();
+}
+
+async function renderWallpaper() {
+  if (wpRendering) return;
+  wpRendering = true;
+  const previewImg = document.getElementById('wpPreviewImg');
+  const saveBtn = document.getElementById('wpSaveBtn');
+  saveBtn.disabled = true;
+  saveBtn.textContent = 'Rendering...';
+
+  await new Promise(r => setTimeout(r, 30));
+
+  try {
+    const W = 1080, H = 2340;
+    const day = TIMETABLE.days[wpDay];
+    const stages = TIMETABLE.stages;
+    const sets = day.sets;
+
+    // Group by stage
+    const stageMap = {};
+    stages.forEach(st => stageMap[st] = []);
+    sets.forEach(s => { if (stageMap[s.stage]) stageMap[s.stage].push(s); });
+
+    const activeStages = stages.filter(st => stageMap[st].length > 0);
+    const numCols = activeStages.length;
+
+    // Build time range
+    let minTime = Infinity, maxTime = -Infinity;
+    sets.forEach(s => {
+      const st = timeToMinutesRaw(s.start);
+      const en = timeToMinutesRaw(s.end);
+      if (st < minTime) minTime = st;
+      if (en > maxTime) maxTime = en;
+    });
+    minTime = Math.floor(minTime / 60) * 60;
+    maxTime = Math.ceil(maxTime / 60) * 60;
+    const totalMin = maxTime - minTime;
+
+    // Layout
+    const headerH = 90;
+    const stageHeaderH = 32;
+    const footerH = 36;
+    const gridTop = headerH + stageHeaderH;
+    const gridH = H - gridTop - footerH;
+    const timeColW = 52;
+    const colW = (W - timeColW) / numCols;
+    const pxPerMin = gridH / totalMin;
+
+    const canvas = document.createElement('canvas');
+    canvas.width = W;
+    canvas.height = H;
+    const ctx = canvas.getContext('2d');
+
+    // Background
+    ctx.fillStyle = '#06060f';
+    ctx.fillRect(0, 0, W, H);
+
+    // Header
+    ctx.fillStyle = '#d4a843';
+    ctx.font = '700 28px Cinzel, serif';
+    ctx.textAlign = 'center';
+    ctx.fillText('TOMORROWLAND THAILAND 2026', W / 2, 50);
+
+    const date = new Date(day.date + 'T00:00:00');
+    const dayNames = ['SUNDAY','MONDAY','TUESDAY','WEDNESDAY','THURSDAY','FRIDAY','SATURDAY'];
+    const monthNames = ['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'];
+    const dateStr = `${dayNames[date.getDay()]} ${monthNames[date.getMonth()]} ${date.getDate()}`;
+    ctx.fillStyle = 'rgba(255,255,255,0.7)';
+    ctx.font = '500 18px Montserrat, sans-serif';
+    ctx.fillText(dateStr, W / 2, 76);
+
+    // Stage headers
+    const stageHeaderY = headerH;
+    activeStages.forEach((stage, i) => {
+      const x = timeColW + i * colW;
+      const color = STAGE_COLORS[stage];
+      ctx.fillStyle = color + '30';
+      ctx.fillRect(x, stageHeaderY, colW, stageHeaderH);
+      ctx.fillStyle = color;
+      ctx.fillRect(x, stageHeaderY + stageHeaderH - 2, colW, 2);
+      ctx.fillStyle = color;
+      ctx.font = '700 ' + (numCols > 6 ? '11' : '13') + 'px Montserrat, sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText(STAGE_SHORT[stage] || stage, x + colW / 2, stageHeaderY + 21);
+    });
+
+    // Time labels & grid lines (inverted: latest time at top, earliest at bottom — same as main view)
+    const hours = Math.ceil(totalMin / 60);
+    for (let i = 0; i <= hours; i++) {
+      const y = gridTop + gridH - i * 60 * pxPerMin;
+      const h = (BASE_START + Math.floor((minTime + i * 60) / 60)) % 24;
+      const label = h.toString().padStart(2, '0') + ':00';
+
+      ctx.strokeStyle = 'rgba(255,255,255,0.08)';
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.moveTo(timeColW, y);
+      ctx.lineTo(W, y);
+      ctx.stroke();
+
+      ctx.fillStyle = 'rgba(255,255,255,0.4)';
+      ctx.font = '500 13px Montserrat, sans-serif';
+      ctx.textAlign = 'right';
+      ctx.fillText(label, timeColW - 6, y + 5);
+    }
+
+    // Load all artist images
+    const imageCache = {};
+    const imagePromises = [];
+    sets.forEach(s => {
+      const p = loadArtistImageForCanvas(s.artist).then(img => {
+        if (img) imageCache[s.artist] = img;
+      });
+      imagePromises.push(p);
+    });
+    await Promise.all(imagePromises);
+
+    // Draw set cells
+    const hasAnySelection = selections.size > 0;
+
+    activeStages.forEach((stage, colIdx) => {
+      const stageSets = stageMap[stage].sort((a, b) => timeToMinutesRaw(a.start) - timeToMinutesRaw(b.start));
+      const x = timeColW + colIdx * colW;
+      const color = STAGE_COLORS[stage];
+
+      stageSets.forEach(set => {
+        const startMin = timeToMinutesRaw(set.start) - minTime;
+        const endMin = timeToMinutesRaw(set.end) - minTime;
+        const dur = endMin - startMin;
+        const cellH = dur * pxPerMin;
+        const cellY = gridTop + gridH - endMin * pxPerMin;
+        const key = getSetKey(wpDay, set.artist, set.stage);
+        const isSelected = selections.has(key);
+        const isFriend = friendSelections.has(key);
+        // Dim unselected cards when user has picks
+        const isDimmed = hasAnySelection && !isSelected && !isFriend;
+
+        const pad = 2;
+        const cx = x + pad;
+        const cy = cellY + pad;
+        const cw = colW - pad * 2;
+        const ch = cellH - pad * 2;
+
+        // Cell background
+        if (isSelected) {
+          ctx.fillStyle = 'rgba(212,168,67,0.25)';
+        } else if (isFriend) {
+          ctx.fillStyle = 'rgba(0,229,255,0.15)';
+        } else {
+          ctx.fillStyle = isDimmed ? 'rgba(255,255,255,0.02)' : 'rgba(255,255,255,0.04)';
+        }
+        roundRect(ctx, cx, cy, cw, ch, 6);
+        ctx.fill();
+
+        // Top accent line
+        ctx.fillStyle = isSelected ? '#d4a843' : (isFriend ? '#00e5ff' : (isDimmed ? color + '40' : color));
+        ctx.fillRect(cx, cy, cw, 2);
+
+        // Vertical layout: photo → name → time
+        const innerPad = 4;
+        const textW = cw - innerPad * 2;
+        const nameFontSize = numCols > 6 ? 12 : 14;
+        const timeFontSize = numCols > 6 ? 10 : 11;
+
+        ctx.font = '700 ' + nameFontSize + 'px Montserrat, sans-serif';
+        const nameLines = wrapText(ctx, set.artist, textW);
+        const nameLineH = nameFontSize + 2;
+        const nameBlockH = nameLines.length * nameLineH;
+        const timeBlockH = timeFontSize + 4;
+        const textTotalH = nameBlockH + timeBlockH;
+
+        const imgH = Math.max(0, ch - textTotalH - innerPad * 3 - 2);
+        const hasImg = imageCache[set.artist] && imgH >= 24;
+
+        let cursorY = cy + 2 + innerPad;
+
+        // Artist image (top, full width)
+        if (hasImg) {
+          const imgW = cw - innerPad * 2;
+          const imgX = cx + innerPad;
+          const imgY = cursorY;
+          const drawH = imgH;
+
+          ctx.save();
+          // Apply grayscale for dimmed cards
+          if (isDimmed) ctx.globalAlpha = 0.35;
+          roundRect(ctx, imgX, imgY, imgW, drawH, 4);
+          ctx.clip();
+          const src = imageCache[set.artist];
+          const srcRatio = src.width / src.height;
+          const dstRatio = imgW / drawH;
+          let sx = 0, sy = 0, sw = src.width, sh = src.height;
+          if (srcRatio > dstRatio) {
+            sw = src.height * dstRatio;
+            sx = (src.width - sw) / 2;
+          } else {
+            sh = src.width / dstRatio;
+            sy = (src.height - sh) / 2;
+          }
+          ctx.drawImage(src, sx, sy, sw, sh, imgX, imgY, imgW, drawH);
+          ctx.restore();
+
+          // Grayscale overlay for dimmed
+          if (isDimmed) {
+            ctx.save();
+            roundRect(ctx, imgX, imgY, imgW, drawH, 4);
+            ctx.clip();
+            ctx.fillStyle = 'rgba(6,6,15,0.55)';
+            ctx.fillRect(imgX, imgY, imgW, drawH);
+            ctx.restore();
+          }
+
+          cursorY += drawH + innerPad;
+        }
+
+        // Artist name
+        ctx.fillStyle = isSelected ? '#f0d078' : (isFriend ? '#00e5ff' : (isDimmed ? 'rgba(255,255,255,0.35)' : '#f0f0f0'));
+        ctx.font = '700 ' + nameFontSize + 'px Montserrat, sans-serif';
+        ctx.textAlign = 'center';
+        const centerX = cx + cw / 2;
+
+        if (!hasImg) {
+          cursorY = cy + 2 + Math.max(innerPad, (ch - 2 - textTotalH) / 2);
+        }
+
+        nameLines.forEach((line, li) => {
+          const ly = cursorY + nameFontSize + li * nameLineH;
+          if (ly < cy + ch - 2) {
+            ctx.fillText(line, centerX, ly);
+          }
+        });
+
+        // Time
+        const timeY = cursorY + nameFontSize + nameLines.length * nameLineH + 2;
+        if (timeY + timeFontSize < cy + ch) {
+          ctx.fillStyle = isDimmed ? 'rgba(255,255,255,0.2)' : 'rgba(255,255,255,0.45)';
+          ctx.font = '500 ' + timeFontSize + 'px Montserrat, sans-serif';
+          ctx.fillText(set.start + '-' + set.end, centerX, timeY + timeFontSize);
+        }
+
+        // Selected indicator
+        if (isSelected) {
+          ctx.fillStyle = '#d4a843';
+          ctx.beginPath();
+          ctx.arc(cx + cw - 10, cy + 12, 6, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.fillStyle = '#000';
+          ctx.font = '700 9px sans-serif';
+          ctx.textAlign = 'center';
+          ctx.fillText('\u2713', cx + cw - 10, cy + 15);
+        }
+        ctx.textAlign = 'left';
+      });
+    });
+
+    // Footer
+    ctx.fillStyle = 'rgba(255,255,255,0.3)';
+    ctx.font = '500 12px Montserrat, sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText('tml-lineup-picker', W / 2, H - 14);
+
+    // Convert to blob
+    const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/png'));
+    wpBlob = blob;
+
+    // Show preview
+    const url = URL.createObjectURL(blob);
+    previewImg.src = url;
+    saveBtn.disabled = false;
+    saveBtn.textContent = 'Save Image';
+  } catch (err) {
+    console.error('Wallpaper render failed:', err);
+    showToast('Render failed');
+    saveBtn.textContent = 'Save Image';
+    saveBtn.disabled = false;
+  }
+  wpRendering = false;
+}
+
+function loadArtistImageForCanvas(artistName) {
+  return new Promise(resolve => {
+    const candidates = [];
+    if (DJ_FILE_MAP[artistName]) candidates.push(DJ_FILE_MAP[artistName]);
+    const clean = artistName.replace(/[\/\\?%*:|"<>]/g, '');
+    if (DJ_FILES.has(clean)) candidates.push({ file: clean, ext: 'webp' });
+    if (artistName.includes(' B2B ')) {
+      const parts = artistName.split(' B2B ');
+      const first = parts[0].trim();
+      const second = parts[1] ? parts[1].trim() : '';
+      if (DJ_FILE_MAP[first]) candidates.push(DJ_FILE_MAP[first]);
+      if (second && DJ_FILE_MAP[second]) candidates.push(DJ_FILE_MAP[second]);
+      if (DJ_FILES.has(first)) candidates.push({ file: first, ext: 'webp' });
+      if (second && DJ_FILES.has(second)) candidates.push({ file: second, ext: 'webp' });
+    }
+    if (candidates.length === 0) { resolve(null); return; }
+
+    function tryNext(idx) {
+      if (idx >= candidates.length) { resolve(null); return; }
+      const c = candidates[idx];
+      const img = new Image();
+      // crossOrigin not needed for same-origin local files
+      img.src = `DJ/${c.file}.${c.ext}`;
+      img.onload = () => resolve(img);
+      img.onerror = () => tryNext(idx + 1);
+    }
+    tryNext(0);
+  });
+}
+
+function wrapText(ctx, text, maxWidth) {
+  // Handle B2B names specially
+  if (text.includes(' B2B ')) {
+    const parts = text.split(' B2B ');
+    const lines = [];
+    parts.forEach((part, i) => {
+      if (i > 0) lines.push('B2B ' + part);
+      else lines.push(part);
+    });
+    // Check if each line fits, split further if needed
+    const result = [];
+    lines.forEach(line => {
+      if (ctx.measureText(line).width <= maxWidth) {
+        result.push(line);
+      } else {
+        result.push(...breakLine(ctx, line, maxWidth));
+      }
+    });
+    return result;
+  }
+  if (ctx.measureText(text).width <= maxWidth) return [text];
+  return breakLine(ctx, text, maxWidth);
+}
+
+function breakLine(ctx, text, maxWidth) {
+  const words = text.split(' ');
+  const lines = [];
+  let current = '';
+  words.forEach(word => {
+    const test = current ? current + ' ' + word : word;
+    if (ctx.measureText(test).width <= maxWidth) {
+      current = test;
+    } else {
+      if (current) lines.push(current);
+      current = word;
+    }
+  });
+  if (current) lines.push(current);
+  return lines.length ? lines : [text];
+}
+
+function roundRect(ctx, x, y, w, h, r) {
+  ctx.beginPath();
+  ctx.moveTo(x + r, y);
+  ctx.lineTo(x + w - r, y);
+  ctx.quadraticCurveTo(x + w, y, x + w, y + r);
+  ctx.lineTo(x + w, y + h - r);
+  ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+  ctx.lineTo(x + r, y + h);
+  ctx.quadraticCurveTo(x, y + h, x, y + h - r);
+  ctx.lineTo(x, y + r);
+  ctx.quadraticCurveTo(x, y, x + r, y);
+  ctx.closePath();
+}
+
+async function wpDownload() {
+  if (!wpBlob) return;
+  const day = TIMETABLE.days[wpDay];
+  const fileName = `TML_Thailand_${day.day}.png`;
+
+  const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+  if (isMobile && navigator.share && navigator.canShare) {
+    const file = new File([wpBlob], fileName, { type: 'image/png' });
+    if (navigator.canShare({ files: [file] })) {
+      try {
+        await navigator.share({ files: [file], title: 'My TML Picks' });
+        showToast('Saved!');
+        return;
+      } catch(e) {}
+    }
+  }
+  // Fallback: direct download
+  const url = URL.createObjectURL(wpBlob);
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = fileName;
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+  showToast('Image saved!');
 }
 
 // ===== SHARE =====
